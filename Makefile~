@@ -1,5 +1,6 @@
-run-default:
+run-def:
 	python src/ciscal.py -i input.txt -o output.txt
+	rm	src/*.pyc
 
 run:
 	python src/ciscal.py ${ARGS}
@@ -12,3 +13,7 @@ clean-pyc:
 
 clean:
 	rm	src/*.pyc
+
+help:
+	python src/ciscal.py -h
+	rm src/*.pyc

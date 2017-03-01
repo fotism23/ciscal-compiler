@@ -77,15 +77,21 @@ def is_operator(char):
     @return : The next character from the source code string.
 '''
 def get_next_character():
-    global source_content
-    global line
-    global current_source_index
+    global source_content, line, current_source_index
 
     current_source_index = current_source_index+1
 
     if (source_content[current_source_index] is "\n"):
         line = line + 1
     return source_content[current_source_index]
+
+def get_next_word():
+    buffer = ''
+    w = get_next_character()
+    while(w is not ' '):
+        buffer.append(w)
+        w = get_next_character()
+    return buffer
 
 '''
     @name main_loop
@@ -116,8 +122,7 @@ def main_loop():
     @return : True if the source file meets the grammar specifications. False if Not.
 '''
 def check_grammar(input_content):
-    global err_message
-    global source_content
+    global err_message, source_content
 
     err_message = "No Error!"
     source_content = input_content
