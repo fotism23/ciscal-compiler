@@ -88,7 +88,8 @@ def get_next_character():
 def get_next_word():
     buffer = ''
     w = get_next_character()
-    while(w is not ' '):
+    
+    while(w is not ' ' & w is not '\n'):
         buffer.append(w)
         w = get_next_character()
     return buffer
