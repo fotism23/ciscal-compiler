@@ -4,6 +4,7 @@ Project assignment for the undergraduate course Compilers of the Department of C
 
 # Installation
 ` $make [options] `
+  
   Options:
     run-def       Runs the compiler with default parameters.
     run           Runs the compiler with custom parameters.
