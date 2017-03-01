@@ -1,0 +1,76 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+ACTUALPARLIST	src/states.py	/^ACTUALPARLIST = 25$/;"	kind:variable	line:29
+ACTUALPARS	src/states.py	/^ACTUALPARS = 24$/;"	kind:variable	line:28
+ADD_OPER	src/states.py	/^ADD_OPER = 35$/;"	kind:variable	line:39
+ALL_STAT	src/states.py	/^ALL_STAT = 23$/;"	kind:variable	line:27
+ASSIGNMENT_STAT	src/states.py	/^ASSIGNMENT_STAT = 14$/;"	kind:variable	line:18
+BLOCK	src/states.py	/^BLOCK = 1$/;"	kind:variable	line:5
+BOOLFACTOR	src/states.py	/^BOOLFACTOR = 29$/;"	kind:variable	line:33
+BOOLTERM	src/states.py	/^BOOLTERM = 28$/;"	kind:variable	line:32
+BRACKETS_SEQ	src/states.py	/^BRACKETS_SEQ = 11$/;"	kind:variable	line:15
+BRACK_OR_STAT	src/states.py	/^BRACK_OR_STAT = 12$/;"	kind:variable	line:16
+CONDITION	src/states.py	/^CONDITION = 27$/;"	kind:variable	line:31
+CTUALPARITEM	src/states.py	/^CTUALPARITEM = 26$/;"	kind:variable	line:30
+DECLARATION	src/states.py	/^DECLARATION = 2$/;"	kind:variable	line:6
+DO_WHILE_STAT	src/states.py	/^DO_WHILE_STAT = 19$/;"	kind:variable	line:23
+ELSEPART	src/states.py	/^ELSEPART = 16$/;"	kind:variable	line:20
+EQUENCE	src/states.py	/^EQUENCE = 10$/;"	kind:variable	line:14
+EXIT_STAT	src/states.py	/^EXIT_STAT = 20$/;"	kind:variable	line:24
+EXPRESSION	src/states.py	/^EXPRESSION = 30$/;"	kind:variable	line:34
+FACTOR	src/states.py	/^FACTOR = 32$/;"	kind:variable	line:36
+FORMALPARITEM	src/states.py	/^FORMALPARITEM = 9$/;"	kind:variable	line:13
+FORMALPARLIST	src/states.py	/^FORMALPARLIST = 8$/;"	kind:variable	line:12
+FORMALPARS	src/states.py	/^FORMALPARS = 7$/;"	kind:variable	line:11
+FUNC	src/states.py	/^FUNC = 5$/;"	kind:variable	line:9
+FUNCBODY	src/states.py	/^FUNCBODY = 6$/;"	kind:variable	line:10
+F_STAT	src/states.py	/^F_STAT = 15$/;"	kind:variable	line:19
+IDTAIL	src/states.py	/^IDTAIL = 33$/;"	kind:variable	line:37
+MUL_OPER	src/states.py	/^MUL_OPER = 36$/;"	kind:variable	line:40
+OPTIONAL_SIGN	src/states.py	/^OPTIONAL_SIGN = 37$/;"	kind:variable	line:41
+PRINT_STAT	src/states.py	/^PRINT_STAT = 22$/;"	kind:variable	line:26
+PROGRAM	src/states.py	/^PROGRAM = 0$/;"	kind:variable	line:4
+RELATIONAL_OPER	src/states.py	/^RELATIONAL_OPER = 34$/;"	kind:variable	line:38
+RETURN_STAT	src/states.py	/^RETURN_STAT = 21$/;"	kind:variable	line:25
+SELECT_STAT	src/states.py	/^SELECT_STAT = 18$/;"	kind:variable	line:22
+START	src/states.py	/^START = 1000$/;"	kind:variable	line:3
+STATEMENT	src/states.py	/^STATEMENT = 13$/;"	kind:variable	line:17
+SUBPROGRAMS	src/states.py	/^SUBPROGRAMS = 4$/;"	kind:variable	line:8
+TERM	src/states.py	/^TERM = 31$/;"	kind:variable	line:35
+VARLIST	src/states.py	/^VARLIST = 3$/;"	kind:variable	line:7
+WHILE_STAT	src/states.py	/^WHILE_STAT = 17$/;"	kind:variable	line:21
+__init__.py	src/__init__.py	1;"	kind:file	line:1
+ciscal.py	src/ciscal.py	1;"	kind:file	line:1
+current_line	src/lexer.py	/^current_line = 0$/;"	kind:variable	line:27
+current_source_index	src/lexer.py	/^current_source_index = -1$/;"	kind:variable	line:26
+err_message	src/ciscal.py	/^err_message = 'test'$/;"	kind:variable	line:5
+generate_output_file	src/ciscal.py	/^def generate_output_file():$/;"	kind:function	line:35
+get_next_character	src/lexer.py	/^def get_next_character():$/;"	kind:function	line:79
+get_next_word	src/lexer.py	/^def get_next_word():$/;"	kind:function	line:88
+get_program_parameters	src/ciscal.py	/^def get_program_parameters(argv):$/;"	kind:function	line:49
+getopt	src/ciscal.py	/^import getopt, sys, lexer$/;"	kind:namespace	line:3
+init_lexer	src/lexer.py	/^def init_lexer(input_content, debug):$/;"	kind:function	line:152
+input_file_path	src/ciscal.py	/^input_file_path = ''$/;"	kind:variable	line:6
+is_allhanum	src/lexer.py	/^def is_allhanum(char):$/;"	kind:function	line:53
+is_alpha	src/lexer.py	/^def is_alpha(char):$/;"	kind:function	line:35
+is_num	src/lexer.py	/^def is_num(char):$/;"	kind:function	line:44
+is_operator	src/lexer.py	/^def is_operator(char):$/;"	kind:function	line:71
+is_white	src/lexer.py	/^def is_white(char):$/;"	kind:function	line:62
+lexer	src/ciscal.py	/^import getopt, sys, lexer$/;"	kind:namespace	line:3
+lexer	src/lexer.py	/^def lexer():$/;"	kind:function	line:102
+lexer.py	src/lexer.py	1;"	kind:file	line:1
+main	src/ciscal.py	/^def main(argv):$/;"	kind:function	line:68
+output_contetnt	src/ciscal.py	/^output_contetnt = ''$/;"	kind:variable	line:9
+output_file_path	src/ciscal.py	/^output_file_path = ''$/;"	kind:variable	line:7
+print_err_message	src/ciscal.py	/^def print_err_message():$/;"	kind:function	line:24
+read_input_file	src/ciscal.py	/^def read_input_file():$/;"	kind:function	line:18
+reserved	src/lexer.py	/^reserved = {$/;"	kind:variable	line:5
+source_content	src/ciscal.py	/^source_content = ''$/;"	kind:variable	line:8
+source_content	src/lexer.py	/^source_content = ''$/;"	kind:variable	line:25
+states.py	src/states.py	1;"	kind:file	line:1
+sys	src/ciscal.py	/^import getopt, sys, lexer$/;"	kind:namespace	line:3
+usage	src/ciscal.py	/^def usage():$/;"	kind:function	line:43

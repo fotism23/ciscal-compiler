@@ -20,7 +20,7 @@ reserved = {
     "or",
     "return",
     "while",
-	"call"
+    "call"
 }
 source_content = ''
 current_source_index = -1
@@ -51,7 +51,7 @@ def is_num(char):
     @return : True if the parameter is Alphanum-type character. False if Not.
 '''
 def is_allhanum(char):
-	return isAlpha(char)|isNum(char)
+    return is_alpha(char)|is_num(char)
 
 '''
     @name is_white
@@ -60,7 +60,7 @@ def is_allhanum(char):
     @return : True if the parameter is White-type character. False if Not.
 '''
 def is_white(char):
-	return (char is '\n')|(char is ' ')|(char is '\t')
+    return (char is '\n')|(char is ' ')|(char is '\t')
 
 '''
     @name operator
@@ -69,7 +69,7 @@ def is_white(char):
     @return : True if the parameter is operator-type character. False if Not.
 '''
 def is_operator(char):
-	return (char is '+')|(char is '-')|(char is '*')|(char is '/')
+    return (char is '+')|(char is '-')|(char is '*')|(char is '/')
 
 '''
     @name get_next_character
@@ -88,45 +88,72 @@ def get_next_character():
 def get_next_word():
     buffer = ''
     w = get_next_character()
-    
+
     while(w is not ' ' & w is not '\n'):
-        buffer.append(w)
+        buffer += w
         w = get_next_character()
     return buffer
 
 '''
-    @name main_loop
+    @name lexer
 
-    @functionality : 
+    @functionality :
 '''
-def main_loop():
+def lexer():
     current_state = START
     current_char = ''
     current_char_type = ''
 
     while(True):
-        if is_alpha(current_char): current_char_type = 'ALPHA'
-        elif is_num(current_char): current_char_type = 'NUM'
-        elif is_white(current_char): current_char_type = 'WHITE'
+        current_char = get_next_character()
+
+        if is_alpha(current_char):
+            current_char_type = 'ALPHA'
+        elif is_num(current_char):
+            current_char_type = 'NUM'
+        elif is_white(current_char):
+            current_char_type = 'WHITE'
         elif is_operator(current_char):
             if (current_char is '+' | current_char is "-"):
                 current_char_type = 'ADDOPERATOR'
             else:
                 current_char_type = "MULTOPERATOR"
+        else:
+            if current_char is '[':
+                current_char_type = 'LEFTSBRACK'
+            elif current_char is ']':
+                current_char_type = 'RIGHTSBRACK'
+            elif current_char is '{':
+                current_char_type = 'LEFTCBRACK'
+            elif current_char is '}':
+                current_char_type = 'RIGHTCBRACK'
+            elif current_char is '(':
+                current_char_type = 'LEFTPAR'
+            elif current_char is ')':
+                current_char_type = 'RIGHTPAR'
+            elif current_char is '<':
+                current_char_type = 'LESSTHAN'
+            elif current_char is '>':
+                current_char_type = 'GREATERTHAN'
+            elif current_char is '=':
+                current_char_type = 'EQUALS'
+            elif current_char is ',':
+                current_char_type = 'COMMA'
+            elif current_char is ';':
+                current_char_type = 'SEMICOL'
+            elif current_char is ':':
+                current_char_type = 'COL'
+            elif current_char is '':
+                current_char_type = 'EOF'
+            else:
+                current_char_type = 'ERR_01'
 
-'''
-    @name check_grammar
-    @param input_content : a string representation of the input source code.
-    
-    @functionality : 
 
-    @return : True if the source file meets the grammar specifications. False if Not.
-'''
-def check_grammar(input_content):
+def init_lexer(input_content, debug):
     global err_message, source_content
+
+    if debug == True:
+        print input_content
 
     err_message = "No Error!"
     source_content = input_content
-    print input_content
-    return False
-

@@ -69,10 +69,8 @@ def main(argv):
     get_program_parameters(argv)
     read_input_file()
 
-    good = lexer.check_grammar(source_content)
+    lexer.init_lexer(source_content, True)
 
-    if good == False:
-        print_err_message()
 
 if __name__ == "__main__":
     main(sys.argv[1:])
