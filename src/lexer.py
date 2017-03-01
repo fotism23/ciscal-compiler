@@ -22,6 +22,7 @@ reserved = {
     "while",
     "call"
 }
+
 SOURCE_CONTENT = ''
 CURRENT_SOURCE_INDEX = -1
 CURRENT_LINE = 0
@@ -105,6 +106,12 @@ def get_next_word():
         w = get_next_character()
     return buffer
 
+def get_next_state(state, char_type):
+    if state is 'START':
+        return char_type
+    elif state is ''
+    
+
 '''
     @name lexer
 
@@ -115,7 +122,7 @@ def lexer():
     current_char = ''
     current_char_type = ''
 
-    while(True):
+    while True:
         current_char = get_next_character()
 
         if is_alpha(current_char):
@@ -125,7 +132,7 @@ def lexer():
         elif is_white(current_char):
             current_char_type = 'WHITE'
         elif is_operator(current_char):
-            if (current_char is '+' | current_char is "-"):
+            if current_char is '+' | current_char is "-":
                 current_char_type = 'ADDOPERATOR'
             else:
                 current_char_type = "MULTOPERATOR"
@@ -159,11 +166,11 @@ def lexer():
             else:
                 current_char_type = 'ERR_01'
 
-        if current_state is not 'NT_COMMENT':
+        if current_state is not 'NF_COMMENT':
             if current_char is '/':
                 current_char = get_next_character()
                 if current_char is '*':
-                    current_state = 'NT_COMMENT'
+                    current_state = 'NF_COMMENT'
                 else:
                     put_character_back()
                     current_char = '/'
@@ -175,6 +182,8 @@ def lexer():
                     return current_state
                 else:
                     put_character_back()
+        
+        current_state = 
 
 
 def init_lexer(input_content, debug):
