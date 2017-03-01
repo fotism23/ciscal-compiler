@@ -23,6 +23,28 @@ class Type:
     EOF = 19
     ERR_01 = 20
 
+class Lang:
+    reserved = {
+    "and",
+    "declare",
+    "do",
+    "else",
+    "enddeclare",
+    "exit",
+    "procedure",
+    "function",
+    "print",
+    "if",
+    "in",
+    "inout",
+    "not",
+    "program",
+    "or",
+    "return",
+    "while",
+    "call"
+}
+
 class Token:
     NF_START = 0
     NF_ALPHA = 1
@@ -119,5 +141,3 @@ class State:
     ADD_OPER = 36
     MUL_OPER = 37
     OPTIONAL_SIGN = 38
-
-

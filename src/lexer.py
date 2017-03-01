@@ -2,27 +2,6 @@
 
 from consts import *
 
-reserved = {
-    "and",
-    "declare",
-    "do",
-    "else",
-    "enddeclare",
-    "exit",
-    "procedure",
-    "function",
-    "print",
-    "if",
-    "in",
-    "inout",
-    "not",
-    "program",
-    "or",
-    "return",
-    "while",
-    "call"
-}
-
 SOURCE_CONTENT = ''
 CURRENT_SOURCE_INDEX = -1
 CURRENT_LINE = 0
