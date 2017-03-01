@@ -22,9 +22,9 @@ reserved = {
     "while",
     "call"
 }
-source_content = ''
-current_source_index = -1
-current_line = 0
+SOURCE_CONTENT = ''
+CURRENT_SOURCE_INDEX = -1
+CURRENT_LINE = 0
 
 '''
     @name is_alpha
@@ -65,7 +65,6 @@ def is_white(char):
 '''
     @name operator
     @param char : character read from the source code string.
-
     @return : True if the parameter is operator-type character. False if Not.
 '''
 def is_operator(char):
@@ -73,17 +72,29 @@ def is_operator(char):
 
 '''
     @name get_next_character
-
-    @return : The next character from the source code string.
+    @return: The next character from the source code string.
 '''
 def get_next_character():
-    global source_content, line, current_source_index
+    global SOURCE_CONTENT, CURRENT_LINE, CURRENT_SOURCE_INDEX
 
-    current_source_index = current_source_index+1
+    CURRENT_SOURCE_INDEX = CURRENT_SOURCE_INDEX + 1
 
-    if (source_content[current_source_index] is "\n"):
-        line = line + 1
-    return source_content[current_source_index]
+    if SOURCE_CONTENT[CURRENT_SOURCE_INDEX] is "\n":
+        CURRENT_LINE = CURRENT_LINE + 1
+    return SOURCE_CONTENT[CURRENT_SOURCE_INDEX]
+
+'''
+    @name put_character_back
+    @functionality: Undoes the get next character action by moving the cursor to the previous position. 
+    @return: Null.
+'''
+def put_character_back():
+    global SOURCE_CONTENT, CURRENT_LINE, CURRENT_SOURCE_INDEX
+
+    CURRENT_SOURCE_INDEX = CURRENT_SOURCE_INDEX - 1
+    if SOURCE_CONTENT[CURRENT_SOURCE_INDEX] is "\n":
+        CURRENT_LINE = CURRENT_LINE - 1
+
 
 def get_next_word():
     buffer = ''
@@ -148,9 +159,26 @@ def lexer():
             else:
                 current_char_type = 'ERR_01'
 
+        if current_state is not 'NT_COMMENT':
+            if current_char is '/':
+                current_char = get_next_character()
+                if current_char is '*':
+                    current_state = 'NT_COMMENT'
+                else:
+                    put_character_back()
+                    current_char = '/'
+        else:
+            if current_char is '*':
+                current_char = get_next_character()
+                if current_char is '/':
+                    current_state = "T_COMMENT"
+                    return current_state
+                else:
+                    put_character_back()
+
 
 def init_lexer(input_content, debug):
-    global err_message, source_content
+    global err_message, SOURCE_CONTENT
 
     if debug == True:
         print input_content

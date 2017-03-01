@@ -48,7 +48,7 @@ def usage():
 
 def get_program_parameters(argv):
     global input_file_path, output_file_path
-    
+
     try:
         opts, args = getopt.getopt(argv,"hi:o:",["ifile=","ofile="])
     except getopt.GetoptError:
