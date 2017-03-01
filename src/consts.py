@@ -1,7 +1,30 @@
 #!/usr/bin/python
 
+class Type:
+    NUM = 0
+    ALPHA = 1
+    WHITE = 2
+    ADDOPERATOR = 3
+    MULTOPERATOR = 4
+    LESSTHAN = 5
+    GREATERTHAN = 6
+    EQUALS = 7
+    SLASH = 8
+    STAR = 9
+    LEFTSBRACK = 10
+    RIGHTSBRACK = 11
+    LEFTCBRACK = 12
+    RIGHTCBRACK = 13
+    LEFTPAR = 14
+    RIGHTPAR = 15
+    COMMA = 16
+    SEMICOL = 17
+    COL = 18
+    EOF = 19
+    ERR_01 = 20
+
 class Token:
-    NF_COMMENT = 0
+    NF_START = 0
     NF_ALPHA = 1
     NF_NUM = 2
     NF_LESSTHAN = 3
@@ -48,6 +71,13 @@ class Token:
     RETURN = 44
     WHILE = 45
     CALL = 46
+    COMMENT = 48
+
+class StateTable:
+    TABLE = {
+        {}
+    }
+
 
 class State:
     START = 0

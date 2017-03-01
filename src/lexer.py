@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from states import *
+from consts import *
 
 reserved = {
     "and",
@@ -118,59 +118,59 @@ def get_next_state(state, char_type):
     @functionality :
 '''
 def lexer():
-    current_state = START
+    current_state = Token.START
     current_char = ''
-    current_char_type = ''
+    current_char_type = -1
 
     while True:
         current_char = get_next_character()
 
         if is_alpha(current_char):
-            current_char_type = 'ALPHA'
+            current_char_type = Type.ALPHA
         elif is_num(current_char):
-            current_char_type = 'NUM'
+            current_char_type = Type.NUM
         elif is_white(current_char):
-            current_char_type = 'WHITE'
+            current_char_type = Type.WHITE
         elif is_operator(current_char):
             if current_char is '+' | current_char is "-":
-                current_char_type = 'ADDOPERATOR'
+                current_char_type = Type.ADDOPERATOR
             else:
-                current_char_type = "MULTOPERATOR"
+                current_char_type = Type.MULTOPERATOR
         else:
             if current_char is '[':
-                current_char_type = 'LEFTSBRACK'
+                current_char_type = Type.LEFTSBRACK
             elif current_char is ']':
-                current_char_type = 'RIGHTSBRACK'
+                current_char_type = Type.RIGHTSBRACK
             elif current_char is '{':
-                current_char_type = 'LEFTCBRACK'
+                current_char_type = Type.LEFTCBRACK
             elif current_char is '}':
-                current_char_type = 'RIGHTCBRACK'
+                current_char_type = Type.RIGHTCBRACK
             elif current_char is '(':
-                current_char_type = 'LEFTPAR'
+                current_char_type = Type.LEFTPAR
             elif current_char is ')':
-                current_char_type = 'RIGHTPAR'
+                current_char_type = Type.RIGHTPAR
             elif current_char is '<':
-                current_char_type = 'LESSTHAN'
+                current_char_type = Type.LESSTHAN
             elif current_char is '>':
-                current_char_type = 'GREATERTHAN'
+                current_char_type = Type.GREATERTHAN
             elif current_char is '=':
-                current_char_type = 'EQUALS'
+                current_char_type = Type.EQUALS
             elif current_char is ',':
-                current_char_type = 'COMMA'
+                current_char_type = Type.EQUALS
             elif current_char is ';':
-                current_char_type = 'SEMICOL'
+                current_char_type = Type.SEMICOL
             elif current_char is ':':
-                current_char_type = 'COL'
+                current_char_type = Type.COL
             elif current_char is '':
-                current_char_type = 'EOF'
+                current_char_type = Type.EOF
             else:
-                current_char_type = 'ERR_01'
+                current_char_type = Type.ERR_01
 
-        if current_state is not 'NF_COMMENT':
+        if current_state != Token.NF_COMMENT:
             if current_char is '/':
                 current_char = get_next_character()
                 if current_char is '*':
-                    current_state = 'NF_COMMENT'
+                    current_state = Token.NF_COMMENT
                 else:
                     put_character_back()
                     current_char = '/'
@@ -178,12 +178,12 @@ def lexer():
             if current_char is '*':
                 current_char = get_next_character()
                 if current_char is '/':
-                    current_state = "T_COMMENT"
+                    current_state = Token.COMMENT
                     return current_state
                 else:
                     put_character_back()
         
-        current_state = 
+        current_state = get_next_state(current_state, current_char_type)
 
 
 def init_lexer(input_content, debug):
