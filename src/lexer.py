@@ -94,7 +94,49 @@ def get_next_state(state, char_type):
 
 def is_terminal_state():
     return
-    
+
+def identify_character_type(current_char):
+    if is_alpha(current_char):
+        return Type.ALPHA
+    elif is_num(current_char):
+        return Type.NUM
+    elif is_white(current_char):
+        return Type.WHITE
+    elif is_operator(current_char):
+        if current_char is '+' | current_char is "-":
+             return Type.ADDOPERATOR
+        else:
+            return Type.MULTOPERATOR
+    else:
+        if current_char is '[':
+            return Type.LEFTSBRACK
+        elif current_char is ']':
+            return Type.RIGHTSBRACK
+        elif current_char is '{':
+            return Type.LEFTCBRACK
+        elif current_char is '}':
+            return Type.RIGHTCBRACK
+        elif current_char is '(':
+            return Type.LEFTPAR
+        elif current_char is ')':
+            return Type.RIGHTPAR
+        elif current_char is '<':
+            return Type.LESSTHAN
+        elif current_char is '>':
+            return Type.GREATERTHAN
+        elif current_char is '=':
+            return Type.EQUALS
+        elif current_char is ',':
+            return Type.EQUALS
+        elif current_char is ';':
+            return Type.SEMICOL
+        elif current_char is ':':
+            return Type.COL
+        elif current_char is '':
+            return Type.EOF
+
+    return Error.ERROR_NOT_KNOWN_CHARACTER
+
 
 '''
     @name lexer
@@ -110,46 +152,7 @@ def lexer():
     while True:
         current_char = get_next_character()
 
-        if is_alpha(current_char):
-            current_char_type = Type.ALPHA
-        elif is_num(current_char):
-            current_char_type = Type.NUM
-        elif is_white(current_char):
-            current_char_type = Type.WHITE
-        elif is_operator(current_char):
-            if current_char is '+' | current_char is "-":
-                current_char_type = Type.ADDOPERATOR
-            else:
-                current_char_type = Type.MULTOPERATOR
-        else:
-            if current_char is '[':
-                current_char_type = Type.LEFTSBRACK
-            elif current_char is ']':
-                current_char_type = Type.RIGHTSBRACK
-            elif current_char is '{':
-                current_char_type = Type.LEFTCBRACK
-            elif current_char is '}':
-                current_char_type = Type.RIGHTCBRACK
-            elif current_char is '(':
-                current_char_type = Type.LEFTPAR
-            elif current_char is ')':
-                current_char_type = Type.RIGHTPAR
-            elif current_char is '<':
-                current_char_type = Type.LESSTHAN
-            elif current_char is '>':
-                current_char_type = Type.GREATERTHAN
-            elif current_char is '=':
-                current_char_type = Type.EQUALS
-            elif current_char is ',':
-                current_char_type = Type.EQUALS
-            elif current_char is ';':
-                current_char_type = Type.SEMICOL
-            elif current_char is ':':
-                current_char_type = Type.COL
-            elif current_char is '':
-                current_char_type = Type.EOF
-            else:
-                current_char_type = Type.ERR_01
+        current_char_type = identify_character_type(current_char)
 
         if current_state != Token.NF_COMMENT:
             if current_char is '/':
