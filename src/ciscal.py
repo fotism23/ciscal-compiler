@@ -10,9 +10,7 @@ output_contetnt = ''
 
 '''
     @name read_input_file
-
     @functionality: Reads the source file and passes the content into source_content global variable.
-    
     @return: Null
 '''
 def read_input_file():
@@ -23,7 +21,7 @@ def read_input_file():
 
 def print_err_message():
     global err_message
-    
+
     print err_message
     sys.exit()
 
@@ -50,7 +48,7 @@ def get_program_parameters(argv):
     global input_file_path, output_file_path
 
     try:
-        opts, args = getopt.getopt(argv,"hi:o:",["ifile=","ofile="])
+        opts, args = getopt.getopt(argv, "hi:o:", ["ifile=", "ofile="])
     except getopt.GetoptError:
         print 'ciscal.py -i <inputfile> -o <outputfile>'
         sys.exit(2)
@@ -69,8 +67,9 @@ def main(argv):
     get_program_parameters(argv)
     read_input_file()
 
-    lexer.init_lexer(source_content, True)
+    mlexer = lexer.Lexer()
 
+    mlexer.init_lexer(source_content, True)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
