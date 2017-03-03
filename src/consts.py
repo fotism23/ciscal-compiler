@@ -78,7 +78,6 @@ class Token:
 class Error:
     ERROR_NOT_KNOWN_STATE = -1
     ERROR_NOT_KNOWN_CHARACTER = -2
-    
 
 class KnownState:
     AND = 29

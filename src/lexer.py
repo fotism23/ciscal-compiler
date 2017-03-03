@@ -76,25 +76,31 @@ def put_character_back():
     if SOURCE_CONTENT[CURRENT_SOURCE_INDEX] is "\n":
         CURRENT_LINE = CURRENT_LINE - 1
 
-
-def get_next_word():
-    buffer = ''
-    w = get_next_character()
-
-    while(w is not ' ' & w is not '\n'):
-        buffer += w
-        w = get_next_character()
-    return buffer
-
+'''
+    @name get_next_state
+    @param state: Current state.
+    @param char_type: current character type.
+    @return: Null.
+'''
 def get_next_state(state, char_type):
     if state is 'START':
         return char_type
     elif state is '':
         return
 
-def is_terminal_state():
-    return
+'''
+    @name is_terminal_state
+    @param state: state to check if is terminal.
+    @return: True if state is terminal. False if Not.
+'''
+def is_terminal_state(state):
+    return True
 
+'''
+    @name identify_character_type
+    @param current_char: Character to be identified.
+    @return: Character type id. Error if character is not recognizable.
+'''
 def identify_character_type(current_char):
     if is_alpha(current_char):
         return Type.ALPHA
@@ -104,7 +110,7 @@ def identify_character_type(current_char):
         return Type.WHITE
     elif is_operator(current_char):
         if current_char is '+' | current_char is "-":
-             return Type.ADDOPERATOR
+            return Type.ADDOPERATOR
         else:
             return Type.MULTOPERATOR
     else:
@@ -136,7 +142,6 @@ def identify_character_type(current_char):
             return Type.EOF
 
     return Error.ERROR_NOT_KNOWN_CHARACTER
-
 
 '''
     @name lexer
@@ -180,7 +185,7 @@ def lexer():
                 current_state = Token.NF_START
                 continue
 
-            if is_terminal_state() & current_state != Token.WHITE:
+            if is_terminal_state(current_state) & current_state != Token.WHITE:
                 if current_state == Token.ALPHANUM:
                     put_character_back()
                     local_buffer = local_buffer[:-1]
@@ -200,9 +205,12 @@ def lexer():
                 return current_state
     return Error.ERROR_NOT_KNOWN_STATE
 
-
-
-
+'''
+    @name init_lexer
+    @param input_content: Source code input in string representation.
+    @param debug: Enable Debuging Boolean (Developers only).
+    @return: Null.
+'''
 def init_lexer(input_content, debug):
     global err_message, SOURCE_CONTENT
 
