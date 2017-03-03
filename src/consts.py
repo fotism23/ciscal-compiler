@@ -24,7 +24,7 @@ class Type:
     ERR_01 = 20
 
 class Lang:
-    reserved = {
+    reserved = [
     "and",
     "declare",
     "do",
@@ -42,8 +42,7 @@ class Lang:
     "or",
     "return",
     "while",
-    "call"
-}
+    "call"]
 
 class Token:
     NF_START = 0
@@ -52,8 +51,8 @@ class Token:
     NF_LESSTHAN = 3
     NF_GREATERTHAN = 4
     NF_COMMENT = 5
-    ID = 6
-    INTEGER = 7
+    ALPHANUM = 6
+    NUM = 7
     CHAR = 8
     WHITE = 9
     ADDOPERATOR = 10
@@ -75,6 +74,12 @@ class Token:
     COMMA = 26
     SEMICOL = 27
     COL = 28
+
+class Error:
+    ERROR_NOT_KNOWN_STATE = -1
+    
+
+class KnownState:
     AND = 29
     DECLARE = 30
     DO = 31
@@ -94,11 +99,6 @@ class Token:
     WHILE = 45
     CALL = 46
     COMMENT = 48
-
-class StateTable:
-    TABLE = {
-        {}
-    }
 
 
 class State:

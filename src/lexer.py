@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from consts import *
+import string
 
 SOURCE_CONTENT = ''
 CURRENT_SOURCE_INDEX = -1
@@ -88,7 +89,11 @@ def get_next_word():
 def get_next_state(state, char_type):
     if state is 'START':
         return char_type
-    elif state is ''
+    elif state is '':
+        return
+
+def is_terminal_state():
+    return
     
 
 '''
@@ -97,9 +102,10 @@ def get_next_state(state, char_type):
     @functionality :
 '''
 def lexer():
-    current_state = Token.START
+    current_state = Token.NF_START
     current_char = ''
     current_char_type = -1
+    local_buffer = ''
 
     while True:
         current_char = get_next_character()
@@ -157,12 +163,41 @@ def lexer():
             if current_char is '*':
                 current_char = get_next_character()
                 if current_char is '/':
-                    current_state = Token.COMMENT
+                    current_state = KnownState.COMMENT
                     return current_state
                 else:
                     put_character_back()
-        
+
         current_state = get_next_state(current_state, current_char_type)
+
+        if current_state != Token.NF_COMMENT:
+            if current_state != Token.WHITE:
+                local_buffer += current_char
+            else:
+                current_state = Token.NF_START
+                continue
+
+            if is_terminal_state() & current_state != Token.WHITE:
+                if current_state == Token.ALPHANUM:
+                    put_character_back()
+                    local_buffer = local_buffer[:-1]
+
+                    if buffer in Lang.reserved:
+                        current_state = Lang.reserved.index(buffer)
+                        return current_state
+
+                if current_state == Token.NUM:
+                    put_character_back()
+                    local_buffer = local_buffer[:-1]
+
+                if current_state == Token.GREATERTHAN | current_state == Token.LESSTHAN:
+                    put_character_back()
+
+                local_buffer = local_buffer[:-1]
+                return current_state
+    return Error.ERROR_NOT_KNOWN_STATE
+
+
 
 
 def init_lexer(input_content, debug):
