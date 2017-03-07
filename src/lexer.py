@@ -181,7 +181,7 @@ class Lexer(object):
             current_char = self.get_next_character()
 
             current_char_type = self.identify_character_type(current_char)
-            
+
             if current_state != Token.NT_COMMENT:
                 if current_char is '/':
                     current_char = self.get_next_character()

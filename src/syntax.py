@@ -44,7 +44,12 @@ class Syntax(object):
         else:
             error_handler("program id expected")
 
-
-
-
-
+    def subprogram(self):
+        function_type = ''
+        if token == Token.PROCEDURE or token == Token.FUNCTION:
+            if (token == Token.PROCEDURE):
+                function_type = 'PROC'
+            else:
+                function_type = 'FUNC'
+            run_lexer()
+            
