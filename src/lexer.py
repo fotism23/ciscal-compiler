@@ -10,9 +10,16 @@ class Lexer(object):
         self.source_content_index = -1
         self.current_line = 0
         self.err_message = ''
+        self.local_buffer = ''
 
-    def init_lexer(self, input_content, debug):
-        if debug == True:
+    '''
+        @name init_lexer
+        @param input_content: Source code input in string representation.
+        @param debug: Enable Debuging Boolean (Developers only).
+        @return: Null.
+    '''
+    def init_lexer(self, input_content):
+        if DEBUG == True:
             print input_content
 
         self.err_message = "No Error!"
@@ -24,7 +31,7 @@ class Lexer(object):
         @return : True if the parameter is Alpha-type character. False if Not.
     '''
     def is_alpha(self, char):
-        return ((char >= 'A') & (char <= 'Z')) | ((char >= 'a') & (char <= 'z')) | (char == '_')
+        return ((char >= 'A') and (char <= 'Z')) or ((char >= 'a') and (char <= 'z')) or (char == '_')
 
     '''
         @name is_num
@@ -32,7 +39,7 @@ class Lexer(object):
         @return : True if the parameter is Num-type character. False if Not.
     '''
     def is_num(self, char):
-        return (char >= '0') & (char <= '9')
+        return (char >= '0') and (char <= '9')
 
 
     '''
@@ -41,7 +48,7 @@ class Lexer(object):
         @return : True if the parameter is Alphanum-type character. False if Not.
     '''
     def is_allhanum(self, char):
-        return self.is_alpha(char) | self.is_num(char)
+        return self.is_alpha(char) or self.is_num(char)
 
 
     '''
@@ -50,7 +57,7 @@ class Lexer(object):
         @return : True if the parameter is White-type character. False if Not.
     '''
     def is_white(self, char):
-        return (char is '\n') | (char is ' ') | (char is '\t')
+        return (char is '\n') or (char is ' ') or (char is '\t')
 
 
     '''
@@ -59,7 +66,7 @@ class Lexer(object):
         @return : True if the parameter is operator-type character. False if Not.
     '''
     def is_operator(self, char):
-        return (char is '+') | (char is '-') | (char is '*') | (char is '/')
+        return (char is '+') or (char is '-') or (char is '*') or (char is '/')
 
 
     '''
@@ -67,8 +74,10 @@ class Lexer(object):
         @return: The next character from the source code string.
     '''
     def get_next_character(self):
-
         self.source_content_index = self.source_content_index + 1
+
+        if self.source_content_index >= len(self.source_content) - 1:
+            return chr(0)
 
         if self.source_content[self.source_content_index] is "\n":
             self.current_line = self.current_line + 1
@@ -105,13 +114,15 @@ class Lexer(object):
         @return: True if state is terminal. False if Not.
     '''
     def is_terminal_state(self, state):
-        return True
+        if ((state >= Token.ALPHANUM) and (state <= KnownState.COMMENT)) or (state is Error.ERROR_NOT_KNOWN_STATE):
+            return True
+        return False
 
 
     '''
         @name identify_character_type
-        @param current_char: Character to be identified.
-        @return: Character type id. Error if character is not recognizable.
+        @param current_char - Character to be identified.
+        @return Character type id. Error if character is not recognizable.
     '''
     def identify_character_type(self, current_char):
         if self.is_alpha(current_char):
@@ -125,33 +136,32 @@ class Lexer(object):
                 return Type.ADDOPERATOR
             else:
                 return Type.MULTOPERATOR
-        else:
-            if current_char is '[':
-                return Type.LEFTSBRACK
-            elif current_char is ']':
-                return Type.RIGHTSBRACK
-            elif current_char is '{':
-                return Type.LEFTCBRACK
-            elif current_char is '}':
-                return Type.RIGHTCBRACK
-            elif current_char is '(':
-                return Type.LEFTPAR
-            elif current_char is ')':
-                return Type.RIGHTPAR
-            elif current_char is '<':
-                return Type.LESSTHAN
-            elif current_char is '>':
-                return Type.GREATERTHAN
-            elif current_char is '=':
-                return Type.EQUALS
-            elif current_char is ',':
-                return Type.EQUALS
-            elif current_char is ';':
-                return Type.SEMICOL
-            elif current_char is ':':
-                return Type.COL
-            elif current_char is '':
-                return Type.EOF
+        elif current_char is '[':
+            return Type.LEFTSBRACK
+        elif current_char is ']':
+            return Type.RIGHTSBRACK
+        elif current_char is '{':
+            return Type.LEFTCBRACK
+        elif current_char is '}':
+            return Type.RIGHTCBRACK
+        elif current_char is '(':
+            return Type.LEFTPAR
+        elif current_char is ')':
+            return Type.RIGHTPAR
+        elif current_char is '<':
+            return Type.LESSTHAN
+        elif current_char is '>':
+            return Type.GREATERTHAN
+        elif current_char is '=':
+            return Type.EQUALS
+        elif current_char is ',':
+            return Type.EQUALS
+        elif current_char is ';':
+            return Type.SEMICOL
+        elif current_char is ':':
+            return Type.COL
+        elif current_char is chr(0):
+            return Type.EOF
 
         return Error.ERROR_NOT_KNOWN_CHARACTER
 
@@ -162,7 +172,7 @@ class Lexer(object):
         @functionality :
     '''
     def lexer(self):
-        current_state = Token.NF_START
+        current_state = Token.NT_START
         current_char = ''
         current_char_type = -1
         local_buffer = ''
@@ -171,12 +181,12 @@ class Lexer(object):
             current_char = self.get_next_character()
 
             current_char_type = self.identify_character_type(current_char)
-
-            if current_state != Token.NF_COMMENT:
+            
+            if current_state != Token.NT_COMMENT:
                 if current_char is '/':
                     current_char = self.get_next_character()
                     if current_char is '*':
-                        current_state = Token.NF_COMMENT
+                        current_state = Token.NT_COMMENT
                     else:
                         self.put_character_back()
                         current_char = '/'
@@ -191,17 +201,17 @@ class Lexer(object):
 
             current_state = self.get_next_state(current_state, current_char_type)
 
-            if current_state != Token.NF_COMMENT:
+            if current_state != Token.NT_COMMENT:
                 if current_state != Token.WHITE:
-                    local_buffer += current_char
+                    self.local_buffer += current_char
                 else:
-                    current_state = Token.NF_START
+                    current_state = Token.NT_START
                     continue
 
-                if self.is_terminal_state(current_state) & current_state != Token.WHITE:
+                if self.is_terminal_state(current_state) and current_state != Token.WHITE:
                     if current_state == Token.ALPHANUM:
                         self.put_character_back()
-                        local_buffer = local_buffer[:-1]
+                        self.local_buffer = self.local_buffer[:-1]
 
                         if buffer in Lang.reserved:
                             current_state = Lang.reserved.index(buffer)
@@ -209,18 +219,12 @@ class Lexer(object):
 
                     if current_state == Token.NUM:
                         self.put_character_back()
-                        local_buffer = local_buffer[:-1]
+                        self.local_buffer = self.local_buffer[:-1]
 
-                    if current_state == Token.GREATERTHAN | current_state == Token.LESSTHAN:
+                    if current_state == Token.GREATERTHAN or current_state == Token.LESSTHAN:
                         self.put_character_back()
 
-                    local_buffer = local_buffer[:-1]
+                    self.local_buffer = self.local_buffer[:-1]
                     return current_state
         return Error.ERROR_NOT_KNOWN_STATE
 
-    '''
-        @name init_lexer
-        @param input_content: Source code input in string representation.
-        @param debug: Enable Debuging Boolean (Developers only).
-        @return: Null.
-    '''

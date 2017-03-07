@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+DEBUG = True
+
 class Type:
     NUM = 0
     ALPHA = 1
@@ -45,12 +47,12 @@ class Lang:
     "call"]
 
 class Token:
-    NF_START = 0
-    NF_ALPHA = 1
-    NF_NUM = 2
-    NF_LESSTHAN = 3
-    NF_GREATERTHAN = 4
-    NF_COMMENT = 5
+    NT_START = 0
+    NT_ALPHA = 1
+    NT_NUM = 2
+    NT_LESSTHAN = 3
+    NT_GREATERTHAN = 4
+    NT_COMMENT = 5
     ALPHANUM = 6
     NUM = 7
     CHAR = 8
@@ -78,6 +80,7 @@ class Token:
 class Error:
     ERROR_NOT_KNOWN_STATE = -1
     ERROR_NOT_KNOWN_CHARACTER = -2
+    TOKEN_NOT_INITIALIZED = -3
 
 class KnownState:
     AND = 29
@@ -98,8 +101,8 @@ class KnownState:
     RETURN = 44
     WHILE = 45
     CALL = 46
-    COMMENT = 48
-
+    COMMENT = 47
+    
 
 class State:
     START = 0

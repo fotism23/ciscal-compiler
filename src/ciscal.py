@@ -2,7 +2,7 @@
 
 import getopt
 import sys
-import lexer
+import lexer, syntax
 
 err_message = 'test'
 input_file_path = ''
@@ -15,8 +15,6 @@ output_contetnt = ''
     @functionality: Reads the source file and passes the content into source_content global variable.
     @return: Null
 '''
-
-
 def read_input_file():
     global input_file_path, source_content
 
@@ -79,8 +77,10 @@ def main(argv):
     read_input_file()
 
     mlexer = lexer.Lexer()
+    mlexer.init_lexer(source_content)
 
-    mlexer.init_lexer(source_content, True)
+    msyntax = syntax.Syntax(mlexer)
+    msyntax.run_syntax()
 
 if __name__ == "__main__":
     main(sys.argv[1:])
