@@ -102,7 +102,7 @@ class KnownState:
     WHILE = 45
     CALL = 46
     COMMENT = 47
-    
+
 
 class State:
     START = 0
