@@ -6,9 +6,9 @@ Project assignment for the undergraduate course Compilers of the Department of C
 ` $make [options] `
   
   Options:
-    run-def       Runs the compiler with default parameters.
-    run           Runs the compiler with custom parameters.
-    clean         Removes all the unnecessary files from previous runs.
+    run-def       Runs the compiler with default parameters.\n
+    run           Runs the compiler with custom parameters.\n
+    clean         Removes all the unnecessary files from previous runs.\n
     help          Shows Usage
     
 # Usage
