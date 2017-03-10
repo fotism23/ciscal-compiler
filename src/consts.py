@@ -102,7 +102,7 @@ class KnownState:
     WHILE = 45
     CALL = 46
     COMMENT = 47
-
+    SELECT = 48
 
 class State:
     START = 0
@@ -132,7 +132,7 @@ class State:
     ALL_STAT = 24
     ACTUALPARS = 25
     ACTUALPARLIST = 26
-    CTUALPARITEM = 27
+    ACTUALPARITEM = 27
     CONDITION = 28
     BOOLTERM = 29
     BOOLFACTOR = 30

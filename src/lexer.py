@@ -25,6 +25,12 @@ class Lexer(object):
         self.err_message = "No Error!"
         self.source_content = input_content
 
+    def get_buffer(self):
+        return self.local_buffer
+
+    def get_current_line(self):
+        return self.current_line
+
     '''
         @name is_alpha
         @param char : character read from the source code string.
