@@ -25,6 +25,9 @@ class Type:
     EOF = 19
     ERR_01 = 20
 
+'''
+    List of Language's reserved words.
+'''
 class Lang:
     reserved = [
     "and",
@@ -103,6 +106,7 @@ class KnownState:
     CALL = 46
     COMMENT = 47
     SELECT = 48
+    DEFAULT = 49
 
 class State:
     START = 0
