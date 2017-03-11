@@ -52,10 +52,25 @@ class Syntax(object):
         self.run_lexer()
         self.program()
 
+    '''
+        @name new_variable - !!!Not yet implemented at this stage.
+        @name - Variable name.
+        @return: Null.
+    '''
+    def new_variable(self, name):
+        pass
 
     '''
-        Syntax rules functions.
-        Runs lexer and proccess the returned token.
+        @name new_function - !!!Not yet implemented at this stage.
+        @name - Function name.
+        @return: Null.
+    '''
+    def new_function(self, name):
+        pass
+
+    '''
+        Syntax rules functions Start.
+        Runs lexer and proccess the returned token following ciscla's Grammar.
         If the token doesn't match the rules an error is thrown.
     '''
 
@@ -102,6 +117,7 @@ class Syntax(object):
 
     '''
         @name block - Block Rule.
+        @param block_name - Block name.
         @return: Null.
     '''
     def block(self, block_name):
@@ -165,11 +181,9 @@ class Syntax(object):
                 else:
                     self.error_handler("ID expected")
 
-    def new_variable(self, name):
-        pass
-
     '''
         @name function_body - Function Body Rule.
+        @func_name - Function id.
         @return: Null.
     '''
     def function_body(self, func_name):
@@ -248,7 +262,10 @@ class Syntax(object):
         else:
             self.error_handler("{ expexted")
 
-
+    '''
+        @name brack_or_statement - Brack or Statement Rule.
+        @return: Null.
+    '''
     def brack_or_statement(self):
         if self.token == Token.LEFTCBRACK:
             self.brackets_sequence()
@@ -434,6 +451,10 @@ class Syntax(object):
         else:
             self.error_handler("exit statement expected.")
 
+    '''
+        @name return_statement - Return Statement Rule.
+        @return: Null.
+    '''
     def return_statement(self):
         if self.token == KnownState.RETURN:
             self.run_lexer()
@@ -449,6 +470,10 @@ class Syntax(object):
         else:
             self.error_handler("return statement expected.")
 
+    '''
+        @name print_statement - Print Statement Rule.
+        @return: Null.
+    '''
     def print_statement(self):
         if self.token == KnownState.PRINT:
             self.run_lexer()
@@ -464,6 +489,10 @@ class Syntax(object):
         else:
             self.error_handler("print statement expected.")
 
+    '''
+        @name call_statement - Call Statement Rule.
+        @return: Null.
+    '''
     def call_statement(self):
         if self.token == KnownState.CALL:
             self.run_lexer()
@@ -481,6 +510,10 @@ class Syntax(object):
         else:
             self.error_handler("call statement expected.")
 
+    '''
+        @name actualpars - Actualpars Rule.
+        @return: Null.
+    '''
     def actualpars(self, name):
         if self.token == Token.LEFTPAR:
             self.run_lexer()
@@ -492,13 +525,20 @@ class Syntax(object):
         else:
             self.error_handler("( expected.")
 
+    '''
+        @name actualpars_list - Actualpars List Rule.
+        @return: Null.
+    '''
     def actualpars_list(self, name):
         self.actualpar_item(name)
 
         while self.token == Token.COMMA:
             self.run_lexer()
             self.actualpar_item(name)
-
+    '''
+        @name actualpar_item - Actualpars Item Rule.
+        @return: Null.
+    '''
     def actualpar_item(self, name):
         if self.token == KnownState.IN:
             self.run_lexer()
@@ -516,6 +556,10 @@ class Syntax(object):
         else:
             self.error_handler("IN or INOUT expected.")
 
+    '''
+        @name expression - Expression Rule.
+        @return: Null.
+    '''
     def expression(self):
         self.optional_sign()
         self.term()
@@ -524,10 +568,18 @@ class Syntax(object):
             self.run_lexer()
             self.term()
 
+    '''
+        @name optional_sign - Optional Sign Rule.
+        @return: Null.
+    '''
     def optional_sign(self):
         if self.token == Token.ADDOPERATOR:
             self.run_lexer()
 
+    '''
+        @name term - Term Rule.
+        @return: Null.
+    '''
     def term(self):
         self.factor()
 
@@ -535,6 +587,10 @@ class Syntax(object):
             self.run_lexer()
             self.factor()
 
+    '''
+        @name factor - Factor Rule.
+        @return: Null.
+    '''
     def factor(self):
         if self.token == Token.NUM:
             if int(self.get_lexer_buffer()) > 32767 or int(self.get_lexer_buffer()) < -32768:
@@ -566,20 +622,30 @@ class Syntax(object):
                 elif symbol.type == 'PROC':
                     self.error_handler(name + "is not a function")
 
-
-
+    '''
+        @name condition - Condition Rule.
+        @return: Null.
+    '''
     def condition(self):
         self.boolterm()
         while self.token == KnownState.OR:
             self.run_lexer()
             self.boolterm()
 
+    '''
+        @name boolterm - Boolterm Rule.
+        @return: Null.
+    '''
     def boolterm(self):
         self.boolfactor()
         while self.token == KnownState.AND:
             self.run_lexer()
             self.boolfactor()
 
+    '''
+        @name boolfactor - Boolfactor Rule.
+        @return: Null.
+    '''
     def boolfactor(self):
         if self.token == KnownState.NOT:
             self.run_lexer()
@@ -606,6 +672,10 @@ class Syntax(object):
             operator = self.relational_operator()
             self.expression()
 
+    '''
+        @name relational_operator - Relational Operator Rule.
+        @return: Null.
+    '''
     def relational_operator(self):
         if self.token >= Token.EQUALS and self.token <= Token.DIFFERENT:
             operator = self.get_lexer_buffer()
@@ -614,9 +684,9 @@ class Syntax(object):
         else:
             self.error_handler("relational operator expected.")
 
-
-    def new_function(self, name):
-        pass
+    '''
+        Syntax rules functions End.
+    '''
 
 class Statement(object):
     def __init__(self, m_type, m_statement_id):
