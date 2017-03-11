@@ -500,7 +500,21 @@ class Syntax(object):
             self.actualpar_item(name)
 
     def actualpar_item(self, name):
-        pass
+        if self.token == KnownState.IN:
+            self.run_lexer()
+            self.expression()
+        elif self.token == KnownState.INOUT:
+            self.run_lexer()
+            if self.token == Token.ALPHANUM:
+                name = self.get_lexer_buffer()
+                symbol = self.lookup(name)
+                if symbol is None:
+                    self.error_handler(name + " no such variable.")
+                self.run_lexer()
+            else:
+                self.error_handler("expected id.")
+        else:
+            self.error_handler("IN or INOUT expected.")
 
     def expression(self):
         self.optional_sign()
