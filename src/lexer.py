@@ -108,10 +108,44 @@ class Lexer(object):
         @return: Null.
     '''
     def get_next_state(self, state, char_type):
-        if state is 'START':
-            return char_type
-        elif state is '':
-            return
+        transitions = [
+            [
+                Token.NT_NUM, Token.NT_ALPHA, Token.WHITE, Token.ADDOPERATOR, Token.MULTOPERATOR,
+                Token.LESSTHAN, Token.GREATERTHAN, Token.EQUALS, Token.SLASH, Token.STAR, Token.LEFTCBRACK,
+                Token.RIGHTCBRACK, Token.LEFTSBRACK, Token.RIGHTSBRACK, Token.LEFTPAR, Token.RIGHTPAR,
+                Token.COMMA, Token.SEMICOL, Token.COL, Token.EOF, Error.ERROR_NOT_KNOWN_STATE
+            ],
+            [
+                Token.NT_ALPHA, Token.NT_ALPHA, Token.ALPHANUM, Token.ALPHANUM, Token.ALPHANUM, Token.ALPHANUM,
+                Token.ALPHANUM, Token.ALPHANUM, Token.ALPHANUM, Token.ALPHANUM, Token.ALPHANUM, Token.ALPHANUM,
+                Token.ALPHANUM, Token.ALPHANUM, Token.ALPHANUM, Token.ALPHANUM, Token.ALPHANUM, Token.ALPHANUM,
+                Token.ALPHANUM, Token.ALPHANUM, Error.ERROR_NOT_KNOWN_STATE
+            ],
+            [
+                Token.NT_NUM, Token.NUM, Token.NUM, Token.NUM, Token.NUM, Token.NUM, Token.NUM, Token.NUM, 
+                Token.NUM, Token.NUM, Token.NUM, Token.NUM, Token.NUM, Token.NUM, Token.NUM, Token.NUM, 
+                Token.NUM, Token.NUM, Token.NUM, Token.NUM, Token.LESSTHAN
+            ],
+            [
+                Token.LESSTHAN, Token.LESSTHAN, Token.LESSTHAN, Token.LESSTHAN, Token.LESSTHAN, Token.LESSTHAN, 
+                Token.LESSTHAN, Token.LESSTHAN, Token.LESSTHAN, Token.LESSTHAN, Token.LESSTHAN, Token.LESSTHAN, 
+                Token.LESSTHAN, Token.LESSTHAN, Token.LESSTHAN, Token.LESSTHAN, Token.LESSTHAN, Token.LESSTHAN, 
+                Token.LESSTHAN, Token.LESSTHAN, Token.LESSTHAN
+            ],
+            [
+                Token.GREATERTHAN, Token.GREATERTHAN, Token.GREATERTHAN, Token.GREATERTHAN, Token.GREATERTHAN, 
+                Token.GREATERTHAN, Token.GREATERTHAN, Token.GREATERTHAN, Token.GREATERTHAN, Token.GREATERTHAN, 
+                Token.GREATERTHAN, Token.GREATERTHAN, Token.GREATERTHAN, Token.GREATERTHAN, Token.GREATERTHAN, 
+                Token.GREATERTHAN, Token.GREATERTHAN, Token.GREATERTHAN, Token.GREATERTHAN, Token.GREATERTHAN, 
+                Token.GREATERTHAN
+            ],
+            [
+                Token.NT_COMMENT, Token.NT_COMMENT, Token.NT_COMMENT, Token.NT_COMMENT, Token.NT_COMMENT, Token.NT_COMMENT, 
+                Token.NT_COMMENT, Token.NT_COMMENT, Token.NT_COMMENT, Token.NT_COMMENT, Token.NT_COMMENT, Token.NT_COMMENT, 
+                Token.NT_COMMENT, Token.NT_COMMENT, Token.NT_COMMENT, Token.NT_COMMENT, Token.NT_COMMENT, Token.NT_COMMENT, 
+                Token.NT_COMMENT, Error.ERROR_NOT_KNOWN_STATE, Token.NT_COMMENT
+            ]
+        ]
 
 
     '''
@@ -195,7 +229,6 @@ class Lexer(object):
                         current_state = Token.NT_COMMENT
                     else:
                         self.put_character_back()
-                        current_char = '/'
             else:
                 if current_char is '*':
                     current_char = self.get_next_character()
@@ -212,6 +245,7 @@ class Lexer(object):
                     self.local_buffer += current_char
                 else:
                     current_state = Token.NT_START
+                    self.local_buffer = ''
                     continue
 
                 if self.is_terminal_state(current_state) and current_state != Token.WHITE:
@@ -220,8 +254,8 @@ class Lexer(object):
                         self.local_buffer = self.local_buffer[:-1]
 
                         if buffer in Lang.reserved:
-                            current_state = Lang.reserved.index(buffer)
-                            return current_state
+                            index = Lang.reserved.index(buffer)
+                            return KnownState.AND + index
 
                     if current_state == Token.NUM:
                         self.put_character_back()
@@ -231,6 +265,7 @@ class Lexer(object):
                         self.put_character_back()
 
                     self.local_buffer = self.local_buffer[:-1]
+                    self.local_buffer = ''
                     return current_state
         return Error.ERROR_NOT_KNOWN_STATE
 

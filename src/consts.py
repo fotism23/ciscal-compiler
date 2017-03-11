@@ -49,6 +49,7 @@ class Lang:
     "while",
     "call"]
 
+
 class Token:
     NT_START = 0
     NT_ALPHA = 1
@@ -79,6 +80,7 @@ class Token:
     COMMA = 26
     SEMICOL = 27
     COL = 28
+    EOF = 50
 
 class Error:
     ERROR_NOT_KNOWN_STATE = -1
