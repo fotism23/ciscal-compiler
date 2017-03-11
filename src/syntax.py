@@ -271,6 +271,9 @@ class Syntax(object):
             self.brackets_sequence()
         else:
             self.statement()
+            self.run_lexer()
+            if self.token != Token.SEMICOL:
+                self.error_handler("; expected.")
 
     '''
         @name statement - Statement Rule.
@@ -417,7 +420,11 @@ class Syntax(object):
                             self.run_lexer()
                             while True:
                                 if self.token == KnownState.DEFAULT:
-                                    break
+                                    self.run_lexer()
+                                    if self.token == Token.COL:
+                                        break
+                                    else:
+                                        self.error_handler(": expected.")
                                 else:
                                     if self.token == Token.NUM:
                                         self.run_lexer()
