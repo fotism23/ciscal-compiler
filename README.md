@@ -6,7 +6,7 @@ Project assignment for the undergraduate course Compilers of the Department of C
 Fotios Mitropoulos 
 AM : 2486
 
-# Installation
+# Installation-Execution.
 ` $make [options] `
   
   - Options:
@@ -15,9 +15,6 @@ AM : 2486
     - clean:         Removes all the unnecessary files from previous runs.
     - help:          Shows Usage.
     - debug:         Enables bebug printouts.
-    
-# Usage
-` $make help `
 
 # Contact.
 - fotismitropoulos@gmail.com
