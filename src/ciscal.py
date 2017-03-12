@@ -2,13 +2,14 @@
 
 import getopt
 import sys
-import lexer, syntax
+import lexer, syntax, consts, argparse
 
 err_message = 'test'
 input_file_path = ''
 output_file_path = ''
 source_content = ''
 output_contetnt = ''
+debug = False
 
 '''
     @name read_input_file
@@ -19,7 +20,7 @@ def read_input_file():
     global input_file_path, source_content
 
     with open(input_file_path, "r") as infile:
-        source_content = infile.read()
+        source_content = infile.read().encode("utf8")
 
 
 def print_err_message():
@@ -29,34 +30,33 @@ def print_err_message():
     sys.exit()
 
 '''
-    @name generate_output_file
-
-    @functionality: Generates the output file. 
+    @name generate_output_file - Generates the output file. 
+    @return: Null 
 '''
-
-
 def generate_output_file():
     global output_file_path, output_contetnt
 
+
 '''
-    @name usage
-
-    @functionality: Prints usage to the console. 
+    @name usage - Prints usage to the console.
+    @return: Null
 '''
-
-
 def usage():
     print '\nCiscal compiler\n'
+    print 'Ciscal compiler in Python language was developed'
+    print 'as project assignment for the undergraduate course Compilers'
+    print 'of the department of Computer Science & Engineering\nat the University of Ioannina.\n'
     print '(C) Copyright 2017. All rights reserved. Fotios Mitropoulos.'
     print 'Email: cse32486@cs.uoi.gr\n'
-    print 'Usage: ciscal.py -i <inputfile> -o <outputfile>'
-
+    print 'Usage: ciscal.py [options] -i <inputfile> -o <outputfile>'
+    print 'Options: -d : Enable Debugging.'
+    print '         -h : Show usage.'
 
 def get_program_parameters(argv):
-    global input_file_path, output_file_path
+    global input_file_path, output_file_path, debug
 
     try:
-        opts, args = getopt.getopt(argv, "hi:o:", ["ifile=", "ofile="])
+        opts, args = getopt.getopt(argv, "hdi:o:", ["ifile=", "ofile="])
     except getopt.GetoptError:
         print 'ciscal.py -i <inputfile> -o <outputfile>'
         sys.exit(2)
@@ -64,19 +64,22 @@ def get_program_parameters(argv):
         if opt == '-h':
             usage()
             sys.exit()
+        elif opt == '-d':
+            debug = True
         elif opt in ("-i", "--ifile"):
             input_file_path = arg
         elif opt in ("-o", "--ofile"):
             output_file_path = arg
-    print 'Input file is ', input_file_path
-    print 'Output file is ', output_file_path
 
+    if debug:
+        print 'Input file is ', input_file_path
+        print 'Output file is ', output_file_path
 
 def main(argv):
     get_program_parameters(argv)
     read_input_file()
 
-    mlexer = lexer.Lexer()
+    mlexer = lexer.Lexer(debug)
     mlexer.init_lexer(source_content)
 
     msyntax = syntax.Syntax(mlexer)

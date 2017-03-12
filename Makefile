@@ -17,3 +17,7 @@ clean:
 help:
 	python src/ciscal.py -h
 	rm src/*.pyc
+
+debug:
+	python src/ciscal.py -d -i input.cis -o output.out
+	rm	src/*.pyc

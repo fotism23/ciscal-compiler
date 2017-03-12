@@ -1,1 +1,13 @@
-asdgasdgsadg
+program test1 {
+    declare
+        sum,i
+    enddeclare
+
+        procedure test_procedure (in i) {
+            
+        }
+        
+        i := 5
+        print(sum);
+        print(i);
+}

@@ -8,6 +8,7 @@ class Syntax(object):
     def __init__(self, lex):
         self.program_id = ''
         self.m_lexer = lex
+        self.debug = lex.debug
         self.token = Error.TOKEN_NOT_INITIALIZED
         self.program_block = True
         self.in_while = False
@@ -19,6 +20,10 @@ class Syntax(object):
     def run_lexer(self):
         while True:
             self.token = self.m_lexer.lexer()
+            if self.debug:
+                print ''
+                print "Token : " + str(self.token)
+                print "Buffer: " + self.get_lexer_buffer()
             if self.token != KnownState.COMMENT:
                 break
 
@@ -40,8 +45,10 @@ class Syntax(object):
         @param message : Error message from the module that found error.
         @return: Null.
     '''
-    def error_handler(self, message):
-        print ("Syntax Error line %d : %d ", self.m_lexer.get_current_line(), message)
+    def error_handler(self, message, caller):
+        if self.debug == True:
+            print "Caller: " + caller
+        print "Syntax Error line " + str(self.m_lexer.get_current_line()) + " : " + message
         exit(0)
 
     '''
@@ -84,7 +91,7 @@ class Syntax(object):
             name = self.id_section()
             self.block(name)
         else:
-            self.error_handler("program expected")
+            self.error_handler("program expected", "program")
 
     '''
         @name id_section - Program ID Rule.
@@ -97,7 +104,7 @@ class Syntax(object):
         if self.token == Token.ALPHANUM:
             self.run_lexer()
         else:
-            self.error_handler("id expected")
+            self.error_handler("id expected", "id_section")
 
     '''
         @name subprogram - Subprograms Rule.
@@ -130,13 +137,12 @@ class Syntax(object):
                 self.declerations()
                 self.subprogram()
                 self.sequence()
-
                 if self.token == Token.RIGHTCBRACK:
                     self.run_lexer()
                 else:
-                    self.error_handler("} expected")
+                    self.error_handler("} expected", "block (program)")
             else:
-                self.error_handler("{ expected")
+                self.error_handler("{ expected", "block")
         else:
             if self.token == Token.LEFTCBRACK:
                 self.run_lexer()
@@ -146,9 +152,9 @@ class Syntax(object):
                 if self.token == Token.RIGHTCBRACK:
                     self.run_lexer()
                 else:
-                    self.error_handler("} expected")
+                    self.error_handler("} expected", "block")
             else:
-                self.error_handler("{ expected")
+                self.error_handler("{ expected", "block")
 
     '''
         @name declerations - Declerations Rule.
@@ -161,7 +167,7 @@ class Syntax(object):
             if self.token == KnownState.ENDDECLARE:
                 self.run_lexer()
             else:
-                self.error_handler("enddeclare expected")
+                self.error_handler("enddeclare expected", "declerations")
 
     '''
         @name varlist - Varlist Rule.
@@ -171,15 +177,13 @@ class Syntax(object):
         if self.token == Token.ALPHANUM:
             self.new_variable(self.get_lexer_buffer())
             self.run_lexer()
-
             while self.token == Token.COMMA:
                 self.run_lexer()
-
                 if self.token == Token.ALPHANUM:
                     self.new_variable(self.get_lexer_buffer())
                     self.run_lexer()
                 else:
-                    self.error_handler("ID expected")
+                    self.error_handler("ID expected", "varlist")
 
     '''
         @name function_body - Function Body Rule.
@@ -201,7 +205,7 @@ class Syntax(object):
             if self.token == Token.RIGHTPAR:
                 self.run_lexer()
             else:
-                self.error_handler(") expected")
+                self.error_handler(") expected", "formalpars")
 
     '''
         @name formalpars_list - Formalpars List Rule.
@@ -232,9 +236,9 @@ class Syntax(object):
 
             item = self.lookup(name)
             if item is not None and item.type == 'FUNC':
-                self.error_handler(name + " function already exists.")
+                self.error_handler(name + "function already exists.", "formalpar item")
         else:
-            self.error_handler("in id or inout id expected")
+            self.error_handler("in id or inout id expected", "formalpar item")
 
     '''
         @name sequence - Sequence Rule.
@@ -258,9 +262,9 @@ class Syntax(object):
             if self.token == Token.RIGHTCBRACK:
                 self.run_lexer()
             else:
-                self.error_handler("} expected")
+                self.error_handler("} expected", "brackets sequence")
         else:
-            self.error_handler("{ expexted")
+            self.error_handler("{ expexted", "brackets sequence")
 
     '''
         @name brack_or_statement - Brack or Statement Rule.
@@ -273,7 +277,7 @@ class Syntax(object):
             self.statement()
             self.run_lexer()
             if self.token != Token.SEMICOL:
-                self.error_handler("; expected.")
+                self.error_handler("; expected.", "brack or statement")
 
     '''
         @name statement - Statement Rule.
@@ -312,9 +316,9 @@ class Syntax(object):
             statement = self.lookup(variable_id)
 
             if statement is None:
-                self.error_handler(variable_id + " no such variable.")
+                self.error_handler(variable_id + " no such variable.", "assignment statement")
             elif (statement.type == 'FUNC') or (statement.type == 'CONST'):
-                self.error_handler(variable_id + " is not assignable.")
+                self.error_handler(variable_id + " is not assignable.", "assignment statement")
 
             self.run_lexer()
 
@@ -324,11 +328,11 @@ class Syntax(object):
                     self.run_lexer()
                     self.expression()
                 else:
-                    self.error_handler("assignment operator ( = ) expected")
+                    self.error_handler("assignment operator ( = ) expected", "assignment statement")
             else:
-                self.error_handler("assignment operator ( := ) expected")
+                self.error_handler("assignment operator ( := ) expected", "assignment statement")
         else:
-            self.error_handler("expected variable id before assiignment")
+            self.error_handler("expected variable id before assiignment", "assignment statement")
 
     '''
         @name if_statement - If Assignment Statement Rule.
@@ -346,11 +350,11 @@ class Syntax(object):
                     self.brack_or_statement()
                     self.elsepart()
                 else:
-                    self.error_handler(") expected")
+                    self.error_handler(") expected", "id statement")
             else:
-                self.error_handler("(<parameters>) expected")
+                self.error_handler("(<parameters>) expected", "id statement")
         else:
-            self.error_handler("if expected")
+            self.error_handler("if expected", "id statement")
 
     def elsepart(self):
         if self.token == KnownState.ELSE:
@@ -375,11 +379,11 @@ class Syntax(object):
                     self.brack_or_statement()
                     self.in_while = False
                 else:
-                    self.error_handler("expected ).")
+                    self.error_handler("expected ).", "while statement")
             else:
-                self.error_handler("expected ( after while statement.")
+                self.error_handler("expected ( after while statement.", "while statement")
         else:
-            self.error_handler("expected while statement.")
+            self.error_handler("expected while statement.", "while statement")
 
     def do_while_statement(self):
         if self.token == KnownState.DO:
@@ -396,13 +400,13 @@ class Syntax(object):
                     if self.token == Token.RIGHTPAR:
                         self.run_lexer()
                     else:
-                        self.error_handler("expected ).")
+                        self.error_handler("expected ).", "do while statement")
                 else:
-                    self.error_handler("expected ( after while statement.")
+                    self.error_handler("expected ( after while statement.", "do while statement")
             else:
-                self.error_handler("expected while statement.")
+                self.error_handler("expected while statement.", "do while statement")
         else:
-            self.error_handler("expected do.")
+            self.error_handler("expected do.", "do while statement")
 
     def select_statement(self):
         if self.token == KnownState.SELECT:
@@ -413,7 +417,7 @@ class Syntax(object):
                     name = self.get_lexer_buffer()
                     var = self.lookup(name)
                     if var is None:
-                        self.error_handler("variable with id " + name + " not found.")
+                        self.error_handler("variable with id " + name + " not found.", "select statement")
                     else:
                         self.run_lexer()
                         if self.token == Token.RIGHTPAR:
@@ -424,7 +428,7 @@ class Syntax(object):
                                     if self.token == Token.COL:
                                         break
                                     else:
-                                        self.error_handler(": expected.")
+                                        self.error_handler(": expected.", "select statement")
                                 else:
                                     if self.token == Token.NUM:
                                         self.run_lexer()
@@ -432,19 +436,19 @@ class Syntax(object):
                                             self.run_lexer()
                                             self.brack_or_statement()
                                         else:
-                                            self.error_handler(": expected.")
+                                            self.error_handler(": expected.", "select statement")
                                     else:
-                                        self.error_handler("constant value or default statement expected.")
+                                        self.error_handler("constant value or default statement expected.", "select statement")
                                 self.run_lexer()
                             self.brack_or_statement()
                         else:
-                            self.error_handler(") expected.")
+                            self.error_handler(") expected.", "select statement")
                 else:
-                    self.error_handler("variable id expected.")
+                    self.error_handler("variable id expected.", "select statement")
             else:
-                self.error_handler("( expected.")
+                self.error_handler("( expected.", "select statement")
         else:
-            self.error_handler("select statement.")
+            self.error_handler("select statement.", "select statement")
 
     '''
         @name exit_statement - Exit Statement Rule.
@@ -456,7 +460,7 @@ class Syntax(object):
                 exit()
             self.run_lexer()
         else:
-            self.error_handler("exit statement expected.")
+            self.error_handler("exit statement expected.", "exit statement")
 
     '''
         @name return_statement - Return Statement Rule.
@@ -471,11 +475,11 @@ class Syntax(object):
                 if self.token == Token.RIGHTPAR:
                     self.run_lexer()
                 else:
-                    self.error_handler(") expected.")
+                    self.error_handler(") expected.", "return statement")
             else:
-                self.error_handler("( expected after return statement.")
+                self.error_handler("( expected after return statement.", "return statement")
         else:
-            self.error_handler("return statement expected.")
+            self.error_handler("return statement expected.", "return statement")
 
     '''
         @name print_statement - Print Statement Rule.
@@ -490,11 +494,11 @@ class Syntax(object):
                 if self.token == Token.RIGHTPAR:
                     self.run_lexer()
                 else:
-                    self.error_handler(") expected.")
+                    self.error_handler(") expected.", "print statement")
             else:
-                self.error_handler("( expected.")
+                self.error_handler("( expected.", "print statement")
         else:
-            self.error_handler("print statement expected.")
+            self.error_handler("print statement expected.", "print statement")
 
     '''
         @name call_statement - Call Statement Rule.
@@ -507,15 +511,15 @@ class Syntax(object):
                 name = self.get_lexer_buffer()
                 item = self.lookup(name)
                 if item is None or (item is not None and item.type != 'FUNC'):
-                    self.error_handler(name + " no such procedure.")
+                    self.error_handler(name + " no such procedure.", "call statement")
                 elif item.type != 'PROC':
-                    self.error_handler(name + " is not a procedure.")
+                    self.error_handler(name + " is not a procedure.", "call statement")
                 self.run_lexer()
                 self.actualpars(name)
             else:
-                self.error_handler("id expected.")
+                self.error_handler("id expected.", "call statement")
         else:
-            self.error_handler("call statement expected.")
+            self.error_handler("call statement expected.", "call statement")
 
     '''
         @name actualpars - Actualpars Rule.
@@ -528,9 +532,9 @@ class Syntax(object):
             if self.token == Token.RIGHTPAR:
                 self.run_lexer()
             else:
-                self.error_handler(") expected.")
+                self.error_handler(") expected.", "actualpars")
         else:
-            self.error_handler("( expected.")
+            self.error_handler("( expected.", "actualpars")
 
     '''
         @name actualpars_list - Actualpars List Rule.
@@ -556,12 +560,12 @@ class Syntax(object):
                 name = self.get_lexer_buffer()
                 symbol = self.lookup(name)
                 if symbol is None:
-                    self.error_handler(name + " no such variable.")
+                    self.error_handler(name + " no such variable.", "actualpar item")
                 self.run_lexer()
             else:
-                self.error_handler("expected id.")
+                self.error_handler("expected id.", "actualpar item")
         else:
-            self.error_handler("IN or INOUT expected.")
+            self.error_handler("IN or INOUT expected.", "actualpar item")
 
     '''
         @name expression - Expression Rule.
@@ -601,7 +605,7 @@ class Syntax(object):
     def factor(self):
         if self.token == Token.NUM:
             if int(self.get_lexer_buffer()) > 32767 or int(self.get_lexer_buffer()) < -32768:
-                self.error_handler("number out of range [-32768, 32767].")
+                self.error_handler("number out of range [-32768, 32767].", "factor")
             self.run_lexer()
         elif self.token == Token.LEFTPAR:
             self.run_lexer()
@@ -610,24 +614,24 @@ class Syntax(object):
             if self.token == Token.RIGHTPAR:
                 self.run_lexer()
             else:
-                self.error_handler(") expected.")
+                self.error_handler(") expected.", "factor")
         else:
             name = self.id_section()
 
             if self.token == Token.LEFTPAR:
                 symbol = self.lookup(name)
                 if (symbol is not None and symbol.type != 'FUNC') or symbol is None:
-                    self.error_handler(name + " is not a function.")
+                    self.error_handler(name + " is not a function.", "factor")
                 self.actualpars(name)
             else:
                 symbol = self.lookup(name)
 
                 if symbol is None:
-                    self.error_handler("variable with id " + name + " not found.")
+                    self.error_handler("variable with id " + name + " not found.", "factor")
                 elif symbol.type == 'FUNC':
                     pass
                 elif symbol.type == 'PROC':
-                    self.error_handler(name + "is not a function")
+                    self.error_handler(name + "is not a function", "factor")
 
     '''
         @name condition - Condition Rule.
@@ -662,9 +666,9 @@ class Syntax(object):
                 if self.token == Token.RIGHTSBRACK:
                     self.run_lexer()
                 else:
-                    self.error_handler("] expected.")
+                    self.error_handler("] expected.", "boolfactor")
             else:
-                self.error_handler("[ expected.")
+                self.error_handler("[ expected.", "boolfactor")
         elif self.token == Token.LEFTSBRACK:
             self.run_lexer()
             self.condition()
@@ -672,7 +676,7 @@ class Syntax(object):
             if self.token == Token.RIGHTSBRACK:
                 self.run_lexer()
             else:
-                self.error_handler('] expected.')
+                self.error_handler('] expected.', "boolfactor")
         else:
 
             self.expression()
@@ -689,7 +693,7 @@ class Syntax(object):
             self.run_lexer()
             return operator
         else:
-            self.error_handler("relational operator expected.")
+            self.error_handler("relational operator expected.", "relational operator")
 
     '''
         Syntax rules functions End.

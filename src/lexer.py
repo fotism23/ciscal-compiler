@@ -5,12 +5,13 @@ import string
 
 
 class Lexer(object):
-    def __init__(self):
+    def __init__(self, m_debug):
         self.source_content = ''
         self.source_content_index = -1
-        self.current_line = 0
+        self.current_line = 1
         self.err_message = ''
         self.local_buffer = ''
+        self.debug = m_debug
 
     '''
         @name init_lexer
@@ -20,7 +21,7 @@ class Lexer(object):
     '''
     def init_lexer(self, input_content):
         if DEBUG == True:
-            print input_content
+            print "Source: " + input_content
 
         self.err_message = "No Error!"
         self.source_content = input_content
@@ -60,7 +61,7 @@ class Lexer(object):
     '''
         @name is_white
         @param char : character read from the source code string.
-        @return : True if the parameter is White-type character. False if Not.
+        @return: True if the parameter is White-type character. False if Not.
     '''
     def is_white(self, char):
         return (char is '\n') or (char is ' ') or (char is '\t')
@@ -69,7 +70,7 @@ class Lexer(object):
     '''
         @name operator
         @param char : character read from the source code string.
-        @return : True if the parameter is operator-type character. False if Not.
+        @return: True if the parameter is operator-type character. False if Not.
     '''
     def is_operator(self, char):
         return (char is '+') or (char is '-') or (char is '*') or (char is '/')
@@ -82,10 +83,11 @@ class Lexer(object):
     def get_next_character(self):
         self.source_content_index = self.source_content_index + 1
 
-        if self.source_content_index >= len(self.source_content) - 1:
+        if self.source_content_index >= len(self.source_content):
             return chr(0)
 
-        if self.source_content[self.source_content_index] is "\n":
+        if "\n" in self.source_content[self.source_content_index]:
+            self.source_content_index = self.source_content_index + 1
             self.current_line = self.current_line + 1
         return self.source_content[self.source_content_index]
 
@@ -108,12 +110,15 @@ class Lexer(object):
         @return: Null.
     '''
     def get_next_state(self, state, char_type):
+        if DEBUG:
+            print "State: " + str(state)
+            print "Char Type: " + str(char_type)
         transitions = [
             [
                 Token.NT_NUM, Token.NT_ALPHA, Token.WHITE, Token.ADDOPERATOR, Token.MULTOPERATOR,
                 Token.LESSTHAN, Token.GREATERTHAN, Token.EQUALS, Token.SLASH, Token.STAR, Token.LEFTCBRACK,
                 Token.RIGHTCBRACK, Token.LEFTSBRACK, Token.RIGHTSBRACK, Token.LEFTPAR, Token.RIGHTPAR,
-                Token.COMMA, Token.SEMICOL, Token.COL, Token.EOF, Error.ERROR_NOT_KNOWN_STATE
+                Token.COMMA, Token.SEMICOL, Token.COL, state, Error.ERROR_NOT_KNOWN_STATE
             ],
             [
                 Token.NT_ALPHA, Token.NT_ALPHA, Token.ALPHANUM, Token.ALPHANUM, Token.ALPHANUM, Token.ALPHANUM,
@@ -146,6 +151,7 @@ class Lexer(object):
                 Token.NT_COMMENT, Error.ERROR_NOT_KNOWN_STATE, Token.NT_COMMENT
             ]
         ]
+        return transitions[state][char_type]
 
 
     '''
@@ -195,13 +201,12 @@ class Lexer(object):
         elif current_char is '=':
             return Type.EQUALS
         elif current_char is ',':
-            return Type.EQUALS
+            return Type.COMMA
         elif current_char is ';':
             return Type.SEMICOL
         elif current_char is ':':
             return Type.COL
-        elif current_char is chr(0):
-            return Type.EOF
+
 
         return Error.ERROR_NOT_KNOWN_CHARACTER
 
@@ -215,9 +220,11 @@ class Lexer(object):
         current_state = Token.NT_START
         current_char = ''
         current_char_type = -1
-        local_buffer = ''
+        self.local_buffer = ''
+        old_character = ''
 
         while True:
+            old_character = current_char
             current_char = self.get_next_character()
 
             current_char_type = self.identify_character_type(current_char)
@@ -251,21 +258,25 @@ class Lexer(object):
                 if self.is_terminal_state(current_state) and current_state != Token.WHITE:
                     if current_state == Token.ALPHANUM:
                         self.put_character_back()
-                        self.local_buffer = self.local_buffer[:-1]
+                        current_char = old_character
 
-                        if buffer in Lang.reserved:
-                            index = Lang.reserved.index(buffer)
+                        self.local_buffer = self.local_buffer[:-1]
+                        if str(self.local_buffer) in Lang.reserved:
+                            index = Lang.reserved.index(self.local_buffer)
                             return KnownState.AND + index
 
                     if current_state == Token.NUM:
                         self.put_character_back()
+                        current_char = old_character
                         self.local_buffer = self.local_buffer[:-1]
 
                     if current_state == Token.GREATERTHAN or current_state == Token.LESSTHAN:
                         self.put_character_back()
+                        current_char = old_character
 
-                    self.local_buffer = self.local_buffer[:-1]
-                    self.local_buffer = ''
+                        self.local_buffer = self.local_buffer[:-1]
+                    
+
                     return current_state
         return Error.ERROR_NOT_KNOWN_STATE
 
