@@ -20,7 +20,7 @@ class Lexer(object):
         @return: Null.
     '''
     def init_lexer(self, input_content):
-        if DEBUG == True:
+        if self.debug:
             print "Source: " + input_content
 
         self.err_message = "No Error!"
@@ -110,7 +110,7 @@ class Lexer(object):
         @return: Null.
     '''
     def get_next_state(self, state, char_type):
-        if DEBUG:
+        if self.debug:
             print "State: " + str(state)
             print "Char Type: " + str(char_type)
         transitions = [
