@@ -11,7 +11,7 @@ AM : 2486
   
   - Options:
     - run-def:       Runs the compiler with default parameters.
-    - run ARGS="<your arguments>":           Runs the compiler with custom parameters.
+    - run ARGS="[your_arguments]":           Runs the compiler with custom parameters.
     - clean:         Removes all the unnecessary files from previous runs.
     - help:          Shows Usage.
     - debug:         Enables bebug printouts.
