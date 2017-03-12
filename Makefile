@@ -2,7 +2,7 @@ run-def:
 	python src/ciscal.py -i input.cis -o output.out
 
 run:
-	python src/ciscal.py ${ARGS}
+	python src/ciscal.py ${mak}
 
 clean:
 	rm	src/*.pyc
