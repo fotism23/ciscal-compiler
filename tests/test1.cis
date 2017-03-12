@@ -1,0 +1,23 @@
+program test {
+    declare
+		sum, i, j
+    enddeclare
+
+    procedure test(in a, in b, inout sum){
+        print(a);
+        print(b);
+        sum := a + b;
+    }
+
+    i := 0;
+    while(i<0){
+        j := 2*i;
+        call test(in i, in j, inout sum);
+        i := i+1;
+    }
+    print(sum);
+}
+        
+
+    
+        
