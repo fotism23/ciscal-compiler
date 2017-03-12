@@ -14,7 +14,13 @@ Project assignment for the undergraduate course Compilers of the Department of C
 # Usage
 ` $make help `
 
+# Student Information.
+Fotios Mitropoulos 
+AM : 2486
 
+# Contact.
+- fotismitropoulos@gmail.com
+- cse32486@cs.uoi.gr
 
 
 
