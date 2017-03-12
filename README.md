@@ -13,7 +13,8 @@ AM : 2486
     - run-def:       Runs the compiler with default parameters.
     - run:           Runs the compiler with custom parameters.
     - clean:         Removes all the unnecessary files from previous runs.
-    - help:          Shows Usage
+    - help:          Shows Usage.
+    - debug:         Enables bebug printouts.
     
 # Usage
 ` $make help `
