@@ -2,6 +2,10 @@
 
 Project assignment for the undergraduate course Compilers of the Department of Computer Science and Engineering at the University of Ioannina.
 
+# Student Information.
+Fotios Mitropoulos 
+AM : 2486
+
 # Installation
 ` $make [options] `
   
@@ -14,14 +18,6 @@ Project assignment for the undergraduate course Compilers of the Department of C
 # Usage
 ` $make help `
 
-# Student Information.
-Fotios Mitropoulos 
-AM : 2486
-
 # Contact.
 - fotismitropoulos@gmail.com
 - cse32486@cs.uoi.gr
-
-
-
-
