@@ -47,6 +47,10 @@ class Lang:
     'while',
     'call']
 
+    TYPE_ARG = 0
+    TYPE_TEMP = 1
+    TYPE_VAR = 2
+    TYPE_FUNC = 3
 
 class Token:
     NT_START = 0

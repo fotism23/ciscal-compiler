@@ -275,7 +275,7 @@ class Lexer(object):
                         current_char = old_character
 
                         self.local_buffer = self.local_buffer[:-1]
-                	    
+
 
                     return current_state
         return Error.ERROR_NOT_KNOWN_STATE
