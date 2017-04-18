@@ -18,13 +18,13 @@ class QuadList(object):
         self.next = None
         self.name = name
 
-
 class Intermidiate(object):
     def __init__(self, debug):
         self.quad_label = 1
         self.quads = None
         self.quad_list = None
         self.debug = debug
+        self.temp_id = 0
 
     def error_handler(self, message, caller):
         if self.debug == True:
@@ -41,7 +41,10 @@ class Intermidiate(object):
         return quad
 
     def newtemp(self):
-        pass
+        var_id = 'temp' + self.temp_id
+        '''
+        new variable
+        '''
 
     def add_quad(self, quad):
         if self.quads is None:
@@ -52,7 +55,7 @@ class Intermidiate(object):
             self.quads = quad
 
     def emptylist(self):
-        pass
+        return QuadList(None)
 
     def makelist(self, x):
         return QuadList(x)
