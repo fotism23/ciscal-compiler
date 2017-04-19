@@ -1,28 +1,5 @@
 #!/usr/bin/python
 
-class Type:
-    NUM = 0
-    ALPHA = 1
-    WHITE = 2
-    ADDOPERATOR = 3
-    MULTOPERATOR = 4
-    LESSTHAN = 5
-    GREATERTHAN = 6
-    EQUALS = 7
-    SLASH = 8
-    STAR = 9
-    LEFTCBRACK = 10
-    RIGHTCBRACK = 11
-    LEFTSBRACK = 12
-    RIGHTSBRACK = 13
-    LEFTPAR = 14
-    RIGHTPAR = 15
-    COMMA = 16
-    SEMICOL = 17
-    COL = 18
-    EOF = 19
-    ERR_01 = 20
-
 '''
     List of Language's reserved words.
 '''
@@ -51,6 +28,7 @@ class Lang:
     TYPE_TEMP = 1
     TYPE_VAR = 2
     TYPE_FUNC = 3
+    TYPE_PROG = 4
 
 class Token:
     NT_START = 0

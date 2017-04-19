@@ -2,16 +2,19 @@
 
 from consts import *
 import string
-import lexer
+import lexer, st, src.int
 
 class Syntax(object):
-    def __init__(self, lex):
+    def __init__(self, lex, symbol_table, intermediate):
         self.program_id = ''
         self.m_lexer = lex
         self.debug = lex.debug
         self.token = Error.TOKEN_NOT_INITIALIZED
         self.program_block = True
         self.in_while = False
+        self.symbol_table = symbol_table
+        self.intermediate = intermediate
+        self.start_quad = 0
 
     '''
         @name run_lexer - Runs lexer and saves the returned state in public token variable.
@@ -72,7 +75,8 @@ class Syntax(object):
         @name - Function name.
         @return: Null.
     '''
-    def new_function(self, name):
+    def new_function(self, name, func_type):
+        self.symbol_table.new_function(name, func_type)
         pass
 
     '''
@@ -128,33 +132,55 @@ class Syntax(object):
         @return: Null.
     '''
     def block(self, block_name):
+        sym_list = self.intermediate.emptylist()
         if self.program_block == True:
             self.program_block = False
 
             if self.token == Token.LEFTCBRACK:
-                self.new_function(block_name)
+                self.symbol_table.push_scope(block_name)
+                self.new_function(block_name, Lang.TYPE_PROG)
                 self.run_lexer()
                 self.declerations()
                 self.subprogram()
-                self.sequence()
+
+                temp = self.symbol_table.lookup(block_name)
+                temp.type_data.start_quad_id = self.symbol_table.quad_label
+                self.start_quad = self.symbol_table.quad_label
+                self.intermediate.genquad("begin_block", self.program_id, "_", "_")
+
+                self.sequence(sym_list)
                 if self.token == Token.RIGHTCBRACK:
+                    self.symbol_table.pop_scope()
                     self.run_lexer()
                 else:
                     self.error_handler("} expected", "block (program)")
             else:
                 self.error_handler("{ expected", "block")
+            self.intermediate.backpatch(sym_list.next, str(self.intermediate.nextquad()))
+            self.intermediate.genquad("halt", "_", "_", "_")
+            self.intermediate.genquad("end_block", self.program_id, "_", "_")
         else:
             if self.token == Token.LEFTCBRACK:
                 self.run_lexer()
                 self.declerations()
                 self.subprogram()
-                self.sequence()
+
+                temp = self.symbol_table.lookup(block_name)
+                temp.type_data.start_quad_id = self.symbol_table.quad_label
+
+                self.intermediate.genquad("begin_block", self.program_id, "_", "_")
+
+                self.sequence(sym_list)
                 if self.token == Token.RIGHTCBRACK:
+                    self.symbol_table.pop_scope()
                     self.run_lexer()
                 else:
                     self.error_handler("} expected", "block")
             else:
                 self.error_handler("{ expected", "block")
+
+            self.intermediate.backpatch(sym_list.next, str(self.intermediate.nextquad()))
+            self.intermediate.genquad("end_block", self.program_id, "_", "_")
 
     '''
         @name declerations - Declerations Rule.
@@ -244,21 +270,26 @@ class Syntax(object):
         @name sequence - Sequence Rule.
         @return: Null.
     '''
-    def sequence(self):
-        self.statement()
+    def sequence(self, sym_list):
+        temp_list = self.intermediate.emptylist()
 
+        self.statement(temp_list)
+
+        temp = temp_list.next
         while self.token == Token.SEMICOL:
             self.run_lexer()
-            self.statement()
+            self.statement(temp_list)
+            temp = self.intermediate.merge(temp, temp_list.next)
+        sym_list.next = temp
 
     '''
         @name brackets_sequence - Brackets Sequence Rule.
         @return: Null.
     '''
-    def brackets_sequence(self):
+    def brackets_sequence(self, sym_list):
         if self.token == Token.LEFTCBRACK:
             self.run_lexer()
-            self.sequence()
+            self.sequence(sym_list)
             if self.token == Token.RIGHTCBRACK:
                 self.run_lexer()
             else:
@@ -270,11 +301,11 @@ class Syntax(object):
         @name brack_or_statement - Brack or Statement Rule.
         @return: Null.
     '''
-    def brack_or_statement(self):
+    def brack_or_statement(self, sym_list):
         if self.token == Token.LEFTCBRACK:
-            self.brackets_sequence()
+            self.brackets_sequence(sym_list)
         else:
-            self.statement()
+            self.statement(sym_list)
             self.run_lexer()
             if self.token != Token.SEMICOL:
                 self.error_handler("; expected.", "brack or statement")
@@ -283,13 +314,16 @@ class Syntax(object):
         @name statement - Statement Rule.
         @return: Null.
     '''
-    def statement(self):
+    def statement(self, sym_list):
+
         if self.token == Token.ALPHANUM:
-            self.assignment_statement()
+            self.assignment_statement(sym_list)
         elif self.token == KnownState.IF:
-            self.if_statement()
+            self.if_statement(sym_list)
+            self.intermediate.backpatch(sym_list, str(self.intermediate.nextquad()))
         elif self.token == KnownState.DO:
-            self.while_statement()
+            self.while_statement(sym_list)
+            sym_list.next = None
         elif self.token == KnownState.EXIT:
             self.exit_statement()
         elif self.token == KnownState.RETURN:

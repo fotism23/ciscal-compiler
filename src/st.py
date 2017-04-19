@@ -42,6 +42,7 @@ class Symbol(object):
         self.current_scope = None
         self.global_scope = None
         self.debug = debug
+        self.quad_label = 0
 
     def error_handler(self, message, caller):
         if self.debug == True:

@@ -19,12 +19,13 @@ class QuadList(object):
         self.name = name
 
 class Intermidiate(object):
-    def __init__(self, debug):
+    def __init__(self, debug, symbol_table):
         self.quad_label = 1
         self.quads = None
         self.quad_list = None
         self.debug = debug
         self.temp_id = 0
+        self.symbol_table = symbol_table
 
     def error_handler(self, message, caller):
         if self.debug == True:
@@ -42,9 +43,9 @@ class Intermidiate(object):
 
     def newtemp(self):
         var_id = 'temp' + self.temp_id
-        '''
-        new variable
-        '''
+        self.temp_id = self.temp_id + 1
+        self.symbol_table.new_variable(var_id, True)
+        return var_id
 
     def add_quad(self, quad):
         if self.quads is None:
