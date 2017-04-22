@@ -17,6 +17,8 @@ class Function(object):
         self.framelength = 0
         self.arguments = []
         self.start_quad_id = -1
+        self.has_return = False
+        self.arg_num = 0
 
 class Argument(object):
     def __init__(self, arg_type):
@@ -32,8 +34,9 @@ class Scope:
         self.name = name
         self.entries = []
         self.nesting_level = nesting_level
-        self.encl_scope = None
+        self.encl_scope = Scope(None)
         self.framelength = 0
+        self.caller = None
 
 class Symbol(object):
     def __init__(self, debug):
@@ -118,9 +121,9 @@ class Symbol(object):
     def lookup(self, name):
         current_scope = self.current_scope
         while current_scope is not None:
-           for sym in current_scope.entries:
-               if str(name) is sym.name:
-                   return sym
+            for sym in current_scope.entries:
+                if str(name) is sym.name:
+                    return sym
             current_scope = current_scope.encl_scope
         return None
 

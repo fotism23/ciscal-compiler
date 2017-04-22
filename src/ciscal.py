@@ -2,7 +2,7 @@
 
 import getopt
 import sys
-import lexer, syntax, consts, argparse
+import lexer, syntax, consts, argparse, st, intermediate
 
 err_message = 'test'
 input_file_path = ''
@@ -82,7 +82,10 @@ def main(argv):
     mlexer = lexer.Lexer(debug)
     mlexer.init_lexer(source_content)
 
-    msyntax = syntax.Syntax(mlexer)
+    msymbol = st.Symbol(debug)
+    minter = intermediate.Intermidiate(debug, msymbol)
+
+    msyntax = syntax.Syntax(mlexer, msymbol, minter)
     msyntax.run_syntax()
 
 if __name__ == "__main__":

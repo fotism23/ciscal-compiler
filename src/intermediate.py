@@ -13,6 +13,12 @@ class Quad(object):
         self.next = None
         self.prev = None
 
+class BoolAttr(object):
+    def __init__(self):
+        self.place = ''
+        self.true = QuadList("truelist")
+        self.false = QuadList("falselist")
+
 class QuadList(object):
     def __init__(self, name):
         self.next = None
@@ -38,7 +44,7 @@ class Intermidiate(object):
 
     def genquad(self, operator, x, y, z):
         quad = Quad(operator, x, y, z)
-        self.add_quad(quad)
+        self.add_quad(quad, self.quads, None)
         return quad
 
     def newtemp(self):
@@ -47,16 +53,20 @@ class Intermidiate(object):
         self.symbol_table.new_variable(var_id, True)
         return var_id
 
-    def add_quad(self, quad):
-        if self.quads is None:
-            self.quads = quad
+    def add_quad(self, quads, quad, tail):
+        if quads is None:
+            quads = quad
+            tail = quads
         else:
-            self.quads.prev = quad
-            quad.next = self.quads
-            self.quads = quad
+            quads.prev = quad
+            quad.next = quads
+            quads = quad
 
     def emptylist(self):
         return QuadList(None)
+
+    def emptyattr(self):
+        return BoolAttr()
 
     def makelist(self, x):
         return QuadList(x)
