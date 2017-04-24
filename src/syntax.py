@@ -41,7 +41,7 @@ class Syntax(object):
         return self.m_lexer.get_current_line()
 
     def lookup(self, lookup_id):
-        return None
+        return self.intermediate.lookup(lookup_id)
 
     '''
         @name error_handler - Prints the error to the console and exits.
