@@ -116,8 +116,8 @@ class Lexer(object):
         transitions = [
             [
                 Token.NT_NUM, Token.NT_ALPHA, Token.WHITE, Token.ADDOPERATOR, Token.MULTOPERATOR,
-                Token.LESSTHAN, Token.GREATERTHAN, Token.EQUALS, Token.SLASH, Token.STAR, Token.LEFTCBRACK,
-                Token.RIGHTCBRACK, Token.LEFTSBRACK, Token.RIGHTSBRACK, Token.LEFTPAR, Token.RIGHTPAR,
+                Token.LESSTHAN, Token.GREATERTHAN, Token.EQUALS, Token.SLASH, Token.STAR, Token.LEFTSBRACK,
+                Token.RIGHTSBRACK, Token.LEFTCBRACK, Token.RIGHTCBRACK, Token.LEFTPAR, Token.RIGHTPAR,
                 Token.COMMA, Token.SEMICOL, Token.COL, state, Error.ERROR_NOT_KNOWN_STATE
             ],
             [

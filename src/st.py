@@ -24,6 +24,9 @@ class Argument(object):
     def __init__(self, arg_type):
         self.type = arg_type
         self.offset = 0
+        self.next_arg = None
+        self.func = None
+
 
 class Variable(object):
     def __init__(self):
@@ -34,9 +37,11 @@ class Scope:
         self.name = name
         self.entries = []
         self.nesting_level = nesting_level
-        self.encl_scope = Scope(None)
+        self.encl_scope = None
         self.framelength = 0
         self.caller = None
+        self.prev = None
+        self.next = None
 
 class Symbol(object):
     def __init__(self, debug):
@@ -112,11 +117,15 @@ class Symbol(object):
     def add_argument(self, name, par_type):
         symbol = Entry(name, Lang.TYPE_ARG)
         symbol.offset = self.current_scope.framelength
-        arg = Argument(par_type)
-        symbol.type_data = arg
+
+        symbol.type_data.type = Lang.TYPE_ARG
+        symbol.type_data.next_arg = None
+        symbol.type_data.func = self.current_scope.prev.entries
+
         symbol.level = self.current_scope.nesting_level
         self.current_scope.framelength = self.current_scope.framelength + 4
         self.add_symbol(symbol)
+
 
     def lookup(self, name):
         current_scope = self.current_scope

@@ -41,7 +41,7 @@ class Syntax(object):
         return self.m_lexer.get_current_line()
 
     def lookup(self, lookup_id):
-        return self.intermediate.lookup(lookup_id)
+        return self.symbol_table.lookup(lookup_id)
 
     '''
         @name error_handler - Prints the error to the console and exits.
@@ -118,9 +118,9 @@ class Syntax(object):
         function_type = ''
         if self.token == KnownState.PROCEDURE or self.token == KnownState.FUNCTION:
             if self.token == KnownState.PROCEDURE:
-                function_type = 'PROC'
+                function_type = Lang.FUNC_TYPE_PROC
             else:
-                function_type = 'FUNC'
+                function_type = Lang.FUNC_TYPE_FUNC
             self.run_lexer()
             name = self.id_section()
             self.new_function(name, function_type)
@@ -133,22 +133,25 @@ class Syntax(object):
     '''
     def block(self, block_name):
         sym_list = self.intermediate.emptylist()
+
         if self.program_block == True:
             self.program_block = False
 
             if self.token == Token.LEFTCBRACK:
                 self.symbol_table.push_scope(block_name)
-                self.new_function(block_name, Lang.TYPE_PROG)
+                self.new_function(block_name, Lang.FUNC_TYPE_PROG)
                 self.run_lexer()
                 self.declerations()
                 self.subprogram()
 
                 temp = self.symbol_table.lookup(block_name)
                 temp.type_data.start_quad_id = self.symbol_table.quad_label
+
                 self.start_quad = self.symbol_table.quad_label
                 self.intermediate.genquad("begin_block", self.program_id, "_", "_")
 
                 self.sequence(sym_list)
+
                 if self.token == Token.RIGHTCBRACK:
                     self.symbol_table.pop_scope()
                     self.run_lexer()
@@ -171,6 +174,7 @@ class Syntax(object):
                 self.intermediate.genquad("begin_block", self.program_id, "_", "_")
 
                 self.sequence(sym_list)
+
                 if self.token == Token.RIGHTCBRACK:
                     self.symbol_table.pop_scope()
                     self.run_lexer()
@@ -249,20 +253,21 @@ class Syntax(object):
         @return: Null.
     '''
     def formalpar_item(self):
-        formalpar_item_type = ''
+        formalpar_item_type = -1
 
         if self.token == KnownState.IN or self.token == KnownState.INOUT:
             if self.token == KnownState.IN:
-                formalpar_item_type = 'IN'
+                formalpar_item_type = Lang.PARAMETER_TYPE_IN
             else:
-                formalpar_item_type = 'INOUT'
+                formalpar_item_type = Lang.PARAMETER_TYPE_INOUT
 
             self.run_lexer()
             name = self.id_section()
 
             item = self.lookup(name)
-            if item is not None and item.type == 'FUNC':
+            if item is not None and item.type == Lang.TYPE_FUNC:
                 self.error_handler(name + "function already exists.", "formalpar item")
+
         else:
             self.error_handler("in id or inout id expected", "formalpar item")
 

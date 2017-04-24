@@ -49,8 +49,14 @@ class Lang:
     TYPE_TEMP = 1
     TYPE_VAR = 2
     TYPE_FUNC = 3
-    TYPE_PROG = 4
-    TYPE_CONST = 5
+    TYPE_CONST = 4
+
+    FUNC_TYPE_FUNC = 6
+    FUNC_TYPE_PROG = 7
+    FUNC_TYPE_PROC = 8
+
+    PARAMETER_TYPE_IN = 10
+    PARAMETER_TYPE_INOUT = 11
 
 class Token:
     NT_START = 0
