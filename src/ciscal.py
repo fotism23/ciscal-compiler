@@ -2,13 +2,17 @@
 
 import getopt
 import sys
-import lexer, syntax, consts, argparse, st, intermediate
+
+import intermediate
+import lexer
+import st
+import syntax
 
 err_message = 'test'
 input_file_path = ''
 output_file_path = ''
 source_content = ''
-output_contetnt = ''
+output_content = ''
 debug = False
 
 '''
@@ -16,9 +20,10 @@ debug = False
     @functionality: Reads the source file and passes the content into source_content global variable.
     @return: Null
 '''
+
+
 def read_input_file():
     global input_file_path, source_content
-
     with open(input_file_path, "r") as infile:
         source_content = infile.read().encode("utf8")
 
@@ -29,18 +34,23 @@ def print_err_message():
     print err_message
     sys.exit()
 
+
 '''
     @name generate_output_file - Generates the output file. 
     @return: Null 
 '''
+
+
 def generate_output_file():
-    global output_file_path, output_contetnt
+    global output_file_path, output_content
 
 
 '''
     @name usage - Prints usage to the console.
     @return: Null
 '''
+
+
 def usage():
     print '\nCiscal compiler\n'
     print 'Ciscal compiler in Python language was developed'
@@ -51,6 +61,7 @@ def usage():
     print 'Usage: ciscal.py [options] -i <inputfile> -o <outputfile>'
     print 'Options: -d : Enable Debugging.'
     print '         -h : Show usage.'
+
 
 def get_program_parameters(argv):
     global input_file_path, output_file_path, debug
@@ -75,6 +86,7 @@ def get_program_parameters(argv):
         print 'Input file is ', input_file_path
         print 'Output file is ', output_file_path
 
+
 def main(argv):
     get_program_parameters(argv)
     read_input_file()
@@ -87,6 +99,7 @@ def main(argv):
 
     msyntax = syntax.Syntax(mlexer, msymbol, minter)
     msyntax.run_syntax()
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])

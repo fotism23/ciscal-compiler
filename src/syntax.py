@@ -4,6 +4,7 @@ from consts import *
 import string
 import lexer, st, intermediate
 
+
 class Syntax(object):
     def __init__(self, lex, symbol_table, inter):
         self.program_id = ''
@@ -20,6 +21,7 @@ class Syntax(object):
         @name run_lexer - Runs lexer and saves the returned state in public token variable.
         @return: Null.
     '''
+
     def run_lexer(self):
         while True:
             self.token = self.m_lexer.lexer()
@@ -48,6 +50,7 @@ class Syntax(object):
         @param message : Error message from the module that found error.
         @return: Null.
     '''
+
     def error_handler(self, message, caller):
         if self.debug == True:
             print "Caller: " + caller
@@ -58,6 +61,7 @@ class Syntax(object):
         @name run_syntax - Runs the the syntax.
         @return: Null.
     '''
+
     def run_syntax(self):
         self.run_lexer()
         self.program()
@@ -67,6 +71,7 @@ class Syntax(object):
         @name - Variable name.
         @return: Null.
     '''
+
     def new_variable(self, name, temp):
         self.symbol_table.new_variable(name, temp)
 
@@ -75,6 +80,7 @@ class Syntax(object):
         @name - Function name.
         @return: Null.
     '''
+
     def new_function(self, name, func_type):
         self.symbol_table.new_function(name, func_type)
         pass
@@ -89,6 +95,7 @@ class Syntax(object):
         @name program - Program Rule.
         @return: Null.
     '''
+
     def program(self):
         if self.token == KnownState.PROGRAM:
             self.run_lexer()
@@ -101,6 +108,7 @@ class Syntax(object):
         @name id_section - Program ID Rule.
         @return: Null.
     '''
+
     def id_section(self):
         if self.token == Token.ALPHANUM and self.program_block:
             program_id = self.get_lexer_buffer()
@@ -114,6 +122,7 @@ class Syntax(object):
         @name subprogram - Subprograms Rule.
         @return: Null.
     '''
+
     def subprogram(self):
         function_type = ''
         if self.token == KnownState.PROCEDURE or self.token == KnownState.FUNCTION:
@@ -131,6 +140,7 @@ class Syntax(object):
         @param block_name - Block name.
         @return: Null.
     '''
+
     def block(self, block_name):
         sym_list = self.intermediate.emptylist()
 
@@ -141,7 +151,7 @@ class Syntax(object):
                 self.symbol_table.push_scope(block_name)
                 self.new_function(block_name, Lang.FUNC_TYPE_PROG)
                 self.run_lexer()
-                self.declerations()
+                self.declarations()
                 self.subprogram()
 
                 temp = self.symbol_table.lookup(block_name)
@@ -165,7 +175,7 @@ class Syntax(object):
         else:
             if self.token == Token.LEFTCBRACK:
                 self.run_lexer()
-                self.declerations()
+                self.declarations()
                 self.subprogram()
 
                 temp = self.symbol_table.lookup(block_name)
@@ -187,23 +197,25 @@ class Syntax(object):
             self.intermediate.genquad("end_block", self.program_id, "_", "_")
 
     '''
-        @name declerations - Declerations Rule.
+        @name declarations - Declarations Rule.
         @return: Null.
     '''
-    def declerations(self):
+
+    def declarations(self):
         if self.token == KnownState.DECLARE:
             self.run_lexer()
-            self.varlist()
+            self.var_list()
             if self.token == KnownState.ENDDECLARE:
                 self.run_lexer()
             else:
-                self.error_handler("enddeclare expected", "declerations")
+                self.error_handler("enddeclare expected", "declarations")
 
     '''
-        @name varlist - Varlist Rule.
+        @name var_list - VarList Rule.
         @return: Null.
     '''
-    def varlist(self):
+
+    def var_list(self):
         if self.token == Token.ALPHANUM:
             self.new_variable(self.get_lexer_buffer(), False)
             self.run_lexer()
@@ -220,46 +232,50 @@ class Syntax(object):
         @func_name - Function id.
         @return: Null.
     '''
+
     def function_body(self, func_name):
-        self.formalpars()
+        self.formal_pars()
         self.block(func_name)
 
     '''
-        @name formalpars - Formalpars Rule.
+        @name formal_pars - FormalPars Rule.
         @return: Null.
     '''
-    def formalpars(self):
+
+    def formal_pars(self):
         if self.token == Token.LEFTPAR:
             self.run_lexer()
-            self.formalpars_list()
+            self.formal_pars_list()
             if self.token == Token.RIGHTPAR:
                 self.run_lexer()
             else:
-                self.error_handler(") expected", "formalpars")
+                self.error_handler(") expected", "formal_pars")
 
     '''
-        @name formalpars_list - Formalpars List Rule.
+        @name formal_pars_list - FormalPars List Rule.
         @return: Null.
     '''
-    def formalpars_list(self):
-        self.formalpar_item()
+
+    def formal_pars_list(self):
+        self.formal_par_item()
 
         while self.token == Token.COMMA:
             self.run_lexer()
-            self.formalpar_item()
+            self.formal_par_item()
 
     '''
-        @name formalpar_item - Formalpars Item Rule.
+        @name formal_par_item - FormalPars Item Rule.
         @return: Null.
     '''
-    def formalpar_item(self):
-        formalpar_item_type = -1
+
+    def formal_par_item(self):
+        formal_par_item_type = -1
 
         if self.token == KnownState.IN or self.token == KnownState.INOUT:
             if self.token == KnownState.IN:
-                formalpar_item_type = Lang.PARAMETER_TYPE_IN
+                formal_par_item_type = Lang.PARAMETER_TYPE_IN
             else:
-                formalpar_item_type = Lang.PARAMETER_TYPE_INOUT
+                formal_par_item_type = Lang.PARAMETER_TYPE_INOUT
 
             self.run_lexer()
             name = self.id_section()
@@ -275,6 +291,7 @@ class Syntax(object):
         @name sequence - Sequence Rule.
         @return: Null.
     '''
+
     def sequence(self, sym_list):
         temp_list = self.intermediate.emptylist()
 
@@ -291,6 +308,7 @@ class Syntax(object):
         @name brackets_sequence - Brackets Sequence Rule.
         @return: Null.
     '''
+
     def brackets_sequence(self, sym_list):
         if self.token == Token.LEFTCBRACK:
             self.run_lexer()
@@ -306,6 +324,7 @@ class Syntax(object):
         @name brack_or_statement - Brack or Statement Rule.
         @return: Null.
     '''
+
     def brack_or_statement(self, sym_list):
         if self.token == Token.LEFTCBRACK:
             self.brackets_sequence(sym_list)
@@ -319,6 +338,7 @@ class Syntax(object):
         @name statement - Statement Rule.
         @return: Null.
     '''
+
     def statement(self, sym_list):
 
         if self.token == Token.ALPHANUM:
@@ -348,6 +368,7 @@ class Syntax(object):
         @name assignment_statement - Assignment Statement Rule.
         @return: Null.
     '''
+
     def assignment_statement(self, sym_list):
         variable_id = ''
         attr = self.intermediate.emptyattr()
@@ -380,6 +401,7 @@ class Syntax(object):
         @name if_statement - If Assignment Statement Rule.
         @return: Null.
     '''
+
     def if_statement(self, sym_list):
         s1 = self.intermediate.emptylist()
         tail = self.intermediate.emptylist()
@@ -427,6 +449,7 @@ class Syntax(object):
         @name while_statement - While Statement Rule.
         @return: Null.
     '''
+
     def while_statement(self, sym_list):
         attr = self.intermediate.emptyattr()
         s1 = self.intermediate.emptylist()
@@ -437,7 +460,7 @@ class Syntax(object):
             self.run_lexer()
             if self.token == Token.LEFTPAR:
                 self.run_lexer()
-                self.condition()
+                self.condition(attr)
                 self.intermediate.backpatch(attr.true, str(self.intermediate.nextquad()))
                 p2 = self.intermediate.nextquad()
                 self.intermediate.backpatch(attr.false, str(self.intermediate.nextquad()))
@@ -446,7 +469,7 @@ class Syntax(object):
                     self.run_lexer()
                     sym_list.next = s1.next
                     self.in_while = True
-                    self.brack_or_statement()
+                    self.brack_or_statement(sym_list)
                     self.in_while = False
                 else:
                     self.error_handler("expected ).", "while statement")
@@ -517,7 +540,8 @@ class Syntax(object):
                                         else:
                                             self.error_handler(": expected.", "select statement")
                                     else:
-                                        self.error_handler("constant value or default statement expected.", "select statement")
+                                        self.error_handler("constant value or default statement expected.",
+                                                           "select statement")
                                 self.run_lexer()
                             self.brack_or_statement()
                         else:
@@ -533,9 +557,10 @@ class Syntax(object):
         @name exit_statement - Exit Statement Rule.
         @return: Null.
     '''
+
     def exit_statement(self):
         if self.token == KnownState.EXIT:
-            if self.in_while == False:
+            if not self.in_while:
                 exit()
             self.run_lexer()
         else:
@@ -545,12 +570,12 @@ class Syntax(object):
         @name return_statement - Return Statement Rule.
         @return: Null.
     '''
+
     def return_statement(self, attr):
-        if (self.symbol_table.current_scope.encl_scope is None or self.symbol_table.caller.type is Lang.TYPE_FUNC):
+        if self.symbol_table.current_scope.encl_scope is None or self.symbol_table.caller.type is Lang.TYPE_FUNC:
             self.error_handler("return statement out of function", "return_statement")
         else:
             self.symbol_table.current_scope.caller.data_type.has_return = True
-
 
         if self.token == KnownState.RETURN:
             self.run_lexer()
@@ -571,6 +596,7 @@ class Syntax(object):
         @name print_statement - Print Statement Rule.
         @return: Null.
     '''
+
     def print_statement(self):
         attr = self.intermediate.emptyattr()
         if self.token == KnownState.PRINT:
@@ -592,6 +618,7 @@ class Syntax(object):
         @name call_statement - Call Statement Rule.
         @return: Null.
     '''
+
     def call_statement(self):
         if self.token == KnownState.CALL:
             self.run_lexer()
@@ -600,10 +627,10 @@ class Syntax(object):
                 item = self.lookup(name)
                 if item is None or (item is not None and item.type != Lang.TYPE_FUNC):
                     self.error_handler(name + " no such procedure.", "call statement")
-                if item.type != Lang.TYPE_PROG:
+                if item.type != Lang.FUNC_TYPE_PROG:
                     self.error_handler(name + " is not a procedure.", "call statement")
                 self.run_lexer()
-                self.actualpars(name)
+                self.actual_pars(name)
                 self.intermediate.genquad("call", "_", "_", name)
             else:
                 self.error_handler("id expected.", "call statement")
@@ -611,40 +638,42 @@ class Syntax(object):
             self.error_handler("call statement expected.", "call statement")
 
     '''
-        @name actualpars - Actualpars Rule.
+        @name actual_pars - ActualPars Rule.
         @return: Null.
     '''
-    def actualpars(self, name):
+
+    def actual_pars(self, name):
         if self.token == Token.LEFTPAR:
             self.run_lexer()
-            self.actualpars_list(name)
+            self.actual_pars_list(name)
             if self.token == Token.RIGHTPAR:
                 self.run_lexer()
             else:
-                self.error_handler(") expected.", "actualpars")
+                self.error_handler(") expected.", "actual_pars")
         else:
-            self.error_handler("( expected.", "actualpars")
+            self.error_handler("( expected.", "actual_pars")
 
     '''
-        @name actualpars_list - Actualpars List Rule.
+        @name actual_pars_list - ActualPars List Rule.
         @return: Null.
     '''
-    def actualpars_list(self, name):
+
+    def actual_pars_list(self, name):
         temp = self.lookup(name)
         m_from = int(self.intermediate.nextquad()) - 1
-        item = self.int.Quad(None)
+        item = self.intermediate.Quad(None)
         item_count = 1
         item_list = self.intermediate.QuadList(None)
         quad = None
         tail = self.intermediate.Quad(None)
 
-        self.actualpar_item(name, item_count, item)
+        self.actual_par_item(name, item_count, item)
         self.intermediate.addquad(item, item_list, tail)
 
         while self.token == Token.COMMA:
             self.run_lexer()
             item_count = item_count + 1
-            self.actualpar_item(name, item_count, item)
+            self.actual_par_item(name, item_count, item)
             quad = item
             self.intermediate.addquad(item, item_list, tail)
 
@@ -656,16 +685,17 @@ class Syntax(object):
             self.error_handler("wrong number of arguments", "actual_pars_list")
 
     '''
-        @name actualpar_item - Actualpars Item Rule.
+        @name actual_par_item - ActualPars Item Rule.
         @return: Null.
     '''
-    def actualpar_item(self, name, item_count, item):
+
+    def actual_par_item(self, name, item_count, item):
         attr = self.intermediate.emptyattr()
         temp = self.lookup(name)
         args = self.intermediate.Entry(name, temp.type_data.func_type)
 
         if item_count > temp.type_data.arg_num:
-            self.error_handler("wrong number of arguments", "actuarpar_item")
+            self.error_handler("wrong number of arguments", "actual_par_item")
 
         for i in range(0, item_count - 1):
             args = args.next
@@ -680,19 +710,20 @@ class Syntax(object):
                 name = self.get_lexer_buffer()
                 symbol = self.lookup(name)
                 if symbol is None:
-                    self.error_handler(name + " no such variable.", "actualpar item")
+                    self.error_handler(name + " no such variable.", "actual_par item")
 
                 item = self.intermediate.newquad("par", "REF", self.get_lexer_buffer(), "_")
                 self.run_lexer()
             else:
-                self.error_handler("expected id.", "actualpar item")
+                self.error_handler("expected id.", "actual_par item")
         else:
-            self.error_handler("IN or INOUT expected.", "actualpar item")
+            self.error_handler("IN or INOUT expected.", "actual_par item")
 
     '''
         @name expression - Expression Rule.
         @return: Null.
     '''
+
     def expression(self, attr):
         attr1 = self.intermediate.emptyattr()
         attr2 = self.intermediate.emptyattr()
@@ -703,7 +734,7 @@ class Syntax(object):
             op = self.get_lexer_buffer()
             op = op[:-1]
             self.run_lexer()
-            self.term(att2)
+            self.term(attr2)
             temp = self.intermediate.newtemp()
             self.intermediate.genquad(op, attr1.place, attr2.place, temp)
             attr1.place = temp
@@ -713,22 +744,23 @@ class Syntax(object):
         @name optional_sign - Optional Sign Rule.
         @return: Null.
     '''
+
     def optional_sign(self, attr1):
         if self.token == Token.ADDOPERATOR:
             op = self.get_lexer_buffer()
             self.run_lexer()
             self.term(attr1)
             temp = self.intermediate.newtemp()
-            self.intermediate.genquad(op, "0", attr1.place, tmep)
+            self.intermediate.genquad(op, "0", attr1.place, temp)
             attr1.place = temp
         else:
             self.term(attr1)
-
 
     '''
         @name term - Term Rule.
         @return: Null.
     '''
+
     def term(self, attr):
         attr1 = self.intermediate.emptyattr()
         attr2 = self.intermediate.emptyattr()
@@ -748,6 +780,7 @@ class Syntax(object):
         @name factor - Factor Rule.
         @return: Null.
     '''
+
     def factor(self, attr):
         attr1 = self.intermediate.emptyattr()
         if self.token == Token.NUM:
@@ -771,7 +804,7 @@ class Syntax(object):
                 symbol = self.lookup(name)
                 if (symbol is not None and symbol.type != Lang.TYPE_FUNC) or symbol is None:
                     self.error_handler(name + " is not a function.", "factor")
-                self.actualpars(name)
+                self.actual_pars(name)
                 temp = self.intermediate.newtemo()
                 self.intermediate.genquad("par", "RET", temp, "_")
                 self.intermediate.genquad("call", "_", "_", temp)
@@ -780,7 +813,7 @@ class Syntax(object):
                 symbol = self.lookup(name)
 
                 if symbol is None:
-                    self.error_handler("variable with id " + name + " not found.", "factor")
+                    self.error_handler("variable with id " + str(name) + " not found.", "factor")
                 elif symbol.type == Lang.TYPE_FUNC:
                     temp = self.intermediate.newtemp()
                     self.intermediate.genquad("par", "RET", temp, "_")
@@ -795,6 +828,7 @@ class Syntax(object):
         @name condition - Condition Rule.
         @return: Null.
     '''
+
     def condition(self, attr):
         attr1 = self.intermediate.emptyattr()
         attr2 = self.intermediate.emptyattr()
@@ -813,25 +847,27 @@ class Syntax(object):
         @name boolterm - Boolterm Rule.
         @return: Null.
     '''
+
     def boolterm(self, attr):
         attr1 = self.intermediate.emptyattr()
         attr2 = self.intermediate.emptyattr()
-        self.boolfactor(attr1)
+        self.bool_factor(attr1)
         attr.true = attr1.true
         attr.false = attr1.false
         while self.token == KnownState.AND:
             self.run_lexer()
             quad = self.intermediate.nextquad()
-            self.boolfactor(att2)
+            self.bool_factor(attr2)
             self.intermediate.backpatch(attr.true, str(quad))
             attr.false = self.intermediate.merge(attr.false, attr2.false)
             attr.false = attr2.true
 
     '''
-        @name boolfactor - Boolfactor Rule.
+        @name bool_factor - BoolFactor Rule.
         @return: Null.
     '''
-    def boolfactor(self, attr):
+
+    def bool_factor(self, attr):
         attr1 = self.intermediate.emptyattr()
         attr2 = self.intermediate.emptyattr()
         m_attr = self.intermediate.emptyattr()
@@ -846,9 +882,9 @@ class Syntax(object):
                     attr.false = m_attr.false
                     attr.true = m_attr.true
                 else:
-                    self.error_handler("] expected.", "boolfactor")
+                    self.error_handler("] expected.", "bool_factor")
             else:
-                self.error_handler("[ expected.", "boolfactor")
+                self.error_handler("[ expected.", "bool_factor")
         elif self.token == Token.LEFTSBRACK:
             self.run_lexer()
             self.condition(m_attr)
@@ -858,7 +894,7 @@ class Syntax(object):
                 attr.false = m_attr.false
                 attr.true = m_attr.true
             else:
-                self.error_handler('] expected.', "boolfactor")
+                self.error_handler('] expected.', "bool_factor")
         else:
             self.expression(attr1)
             operator = self.relational_operator()
@@ -872,8 +908,9 @@ class Syntax(object):
         @name relational_operator - Relational Operator Rule.
         @return: Null.
     '''
+
     def relational_operator(self):
-        if self.token >= Token.EQUALS and self.token <= Token.DIFFERENT:
+        if Token.EQUALS <= self.token <= Token.DIFFERENT:
             operator = self.get_lexer_buffer()
             self.run_lexer()
             return operator
@@ -884,9 +921,8 @@ class Syntax(object):
         Syntax rules functions End.
     '''
 
+
 class Statement(object):
     def __init__(self, m_type, m_statement_id):
         self.type = m_type
         self.statement_id = m_statement_id
-
-

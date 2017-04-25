@@ -54,7 +54,7 @@ class Lexer(object):
         @param char : character read from the source code string.
         @return : True if the parameter is Alphanum-type character. False if Not.
     '''
-    def is_allhanum(self, char):
+    def is_alphanum(self, char):
         return self.is_alpha(char) or self.is_num(char)
 
 
@@ -178,7 +178,7 @@ class Lexer(object):
         elif self.is_white(current_char):
             return Type.WHITE
         elif self.is_operator(current_char):
-            if current_char is '+' | current_char is "-":
+            if current_char is '+' or current_char is "-":
                 return Type.ADDOPERATOR
             else:
                 return Type.MULTOPERATOR
