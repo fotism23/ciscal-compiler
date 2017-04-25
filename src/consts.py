@@ -21,29 +21,33 @@ class Type:
     COL = 18
     EOF = 19
     ERR_01 = 20
+
+
 '''
     List of Language's reserved words.
 '''
+
+
 class Lang:
     reserved = [
-    'and',
-    'declare',
-    'do',
-    'else',
-    'enddeclare',
-    'exit',
-    'procedure',
-    'function',
-    'print',
-    'if',
-    'in',
-    'inout',
-    'not',
-    'program',
-    'or',
-    'return',
-    'while',
-    'call']
+        'and',
+        'declare',
+        'do',
+        'else',
+        'enddeclare',
+        'exit',
+        'procedure',
+        'function',
+        'print',
+        'if',
+        'in',
+        'inout',
+        'not',
+        'program',
+        'or',
+        'return',
+        'while',
+        'call']
 
     TYPE_ARG = 0
     TYPE_TEMP = 1
@@ -57,6 +61,7 @@ class Lang:
 
     PARAMETER_TYPE_IN = 10
     PARAMETER_TYPE_INOUT = 11
+
 
 class Token:
     NT_START = 0
@@ -89,6 +94,7 @@ class Token:
     SEMICOL = 27
     COL = 28
 
+
 class KnownState:
     AND = 29
     DECLARE = 30
@@ -112,6 +118,7 @@ class KnownState:
     COMMENT = 48
     SELECT = 49
     DEFAULT = 50
+
 
 class Error:
     ERROR_NOT_KNOWN_STATE = -1

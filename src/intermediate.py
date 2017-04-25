@@ -1,7 +1,5 @@
 #!/usr/bin/python
 
-from consts import *
-import string
 
 class Quad(object):
     def __init__(self, operator, x, y, z, label):
@@ -13,18 +11,21 @@ class Quad(object):
         self.next = None
         self.prev = None
 
+
 class BoolAttr(object):
     def __init__(self):
         self.place = ''
         self.true = QuadList("truelist")
         self.false = QuadList("falselist")
 
+
 class QuadList(object):
     def __init__(self, name):
         self.next = None
         self.name = name
 
-class Intermidiate(object):
+
+class Intermediate(object):
     def __init__(self, debug, symbol_table):
         self.quad_label = 1
         self.quads = None
@@ -39,15 +40,15 @@ class Intermidiate(object):
         print message
         exit(0)
 
-    def nextquad(self):
+    def next_quad(self):
         return self.quad_label
 
-    def genquad(self, operator, x, y, z):
+    def gen_quad(self, operator, x, y, z):
         quad = Quad(operator, x, y, z)
         self.add_quad(quad, self.quads, None)
         return quad
 
-    def newtemp(self):
+    def new_temp(self):
         var_id = 'temp' + self.temp_id
         self.temp_id = self.temp_id + 1
         self.symbol_table.new_variable(var_id, True)

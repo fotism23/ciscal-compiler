@@ -2,6 +2,7 @@
 
 from consts import *
 
+
 class Entry(object):
     def __init__(self, name, entry_type):
         self.type = entry_type
@@ -11,6 +12,7 @@ class Entry(object):
         self.level = 0
         self.offset = 0
 
+
 class Function(object):
     def __init__(self, func_type):
         self.type = func_type
@@ -19,6 +21,7 @@ class Function(object):
         self.start_quad_id = -1
         self.has_return = False
         self.arg_num = 0
+
 
 class Argument(object):
     def __init__(self, arg_type):
@@ -32,16 +35,18 @@ class Variable(object):
     def __init__(self):
         self.offset = 0
 
+
 class Scope:
     def __init__(self, nesting_level, name):
         self.name = name
         self.entries = []
         self.nesting_level = nesting_level
         self.encl_scope = None
-        self.framelength = 0
+        self.frame_length = 0
         self.caller = None
         self.prev = None
         self.next = None
+
 
 class Symbol(object):
     def __init__(self, debug):
@@ -92,8 +97,8 @@ class Symbol(object):
 
         symbol = Entry(name, entry_type)
 
-        symbol.offset = self.current_scope.framelength
-        self.current_scope.framelength = self.current_scope.framelength + 4
+        symbol.offset = self.current_scope.frame_length
+        self.current_scope.framel_ength = self.current_scope.frame_length + 4
 
         if lookup_entry is not None:
             if lookup_entry.level == self.current_scope.nesting_level:
@@ -116,16 +121,15 @@ class Symbol(object):
 
     def add_argument(self, name, par_type):
         symbol = Entry(name, Lang.TYPE_ARG)
-        symbol.offset = self.current_scope.framelength
+        symbol.offset = self.current_scope.frame_length
 
         symbol.type_data.type = Lang.TYPE_ARG
         symbol.type_data.next_arg = None
         symbol.type_data.func = self.current_scope.prev.entries
 
         symbol.level = self.current_scope.nesting_level
-        self.current_scope.framelength = self.current_scope.framelength + 4
+        self.current_scope.frame_length = self.current_scope.frame_length + 4
         self.add_symbol(symbol)
-
 
     def lookup(self, name):
         current_scope = self.current_scope
@@ -135,4 +139,3 @@ class Symbol(object):
                     return sym
             current_scope = current_scope.encl_scope
         return None
-

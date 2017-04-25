@@ -95,7 +95,7 @@ def main(argv):
     mlexer.init_lexer(source_content)
 
     msymbol = st.Symbol(debug)
-    minter = intermediate.Intermidiate(debug, msymbol)
+    minter = intermediate.Intermediate(debug, msymbol)
 
     msyntax = syntax.Syntax(mlexer, msymbol, minter)
     msyntax.run_syntax()
