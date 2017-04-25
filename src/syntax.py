@@ -67,8 +67,8 @@ class Syntax(object):
         @name - Variable name.
         @return: Null.
     '''
-    def new_variable(self, name):
-        pass
+    def new_variable(self, name, temp):
+        self.symbol_table.new_variable(name, temp)
 
     '''
         @name new_function - !!!Not yet implemented at this stage.
@@ -205,12 +205,12 @@ class Syntax(object):
     '''
     def varlist(self):
         if self.token == Token.ALPHANUM:
-            self.new_variable(self.get_lexer_buffer())
+            self.new_variable(self.get_lexer_buffer(), False)
             self.run_lexer()
             while self.token == Token.COMMA:
                 self.run_lexer()
                 if self.token == Token.ALPHANUM:
-                    self.new_variable(self.get_lexer_buffer())
+                    self.new_variable(self.get_lexer_buffer(), False)
                     self.run_lexer()
                 else:
                     self.error_handler("ID expected", "varlist")
