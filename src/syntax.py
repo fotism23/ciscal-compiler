@@ -284,9 +284,11 @@ class Syntax(object):
             item = self.lookup(name)
             if item is not None and item.type == Lang.TYPE_FUNC:
                 self.error_handler(name + "function already exists.", "formalpar item")
+            self.symbol_table.add_argument(name, formal_par_item_type)
 
         else:
             self.error_handler("in id or inout id expected", "formalpar item")
+
 
     '''
         @name sequence - Sequence Rule.
@@ -423,7 +425,7 @@ class Syntax(object):
                     q2 = self.intermediate.next_quad()
                     self.elsepart(tail)
 
-                    #TODO complete backpatch
+                    # TODO : complete backpatch
 
                     self.intermediate.backpatch(attr.true, str(q1))
                     self.intermediate.backpatch(attr.false, str(q2))

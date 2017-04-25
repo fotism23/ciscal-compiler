@@ -58,7 +58,7 @@ class Symbol(object):
         self.quad_label = 0
 
     def error_handler(self, message, caller):
-        if self.debug == True:
+        if self.debug:
             print "Caller: " + caller
         print message
         exit(0)
@@ -81,16 +81,18 @@ class Symbol(object):
             self.current_scope = scope
 
     def pop_scope(self):
+        # TODO : pop scope
         pass
 
     def add_symbol(self, symbol):
+        # TODO : add symbol
         pass
 
     def new_variable(self, name, temp):
         lookup_entry = self.lookup(name)
 
         entry_type = -1
-        if temp is True:
+        if temp:
             entry_type = Lang.TYPE_TEMP
         else:
             entry_type = Lang.TYPE_VAR
@@ -123,7 +125,8 @@ class Symbol(object):
         symbol = Entry(name, Lang.TYPE_ARG)
         symbol.offset = self.current_scope.frame_length
 
-        symbol.type_data.type = Lang.TYPE_ARG
+        symbol.type_data = Argument(par_type)
+        #symbol.type_data.type = par_type
         symbol.type_data.next_arg = None
         symbol.type_data.func = self.current_scope.prev.entries
 
