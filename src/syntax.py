@@ -143,7 +143,7 @@ class Syntax(object):
     '''
 
     def block(self, block_name):
-        sym_list = self.intermediate.emptylist()
+        sym_list = self.intermediate.empty_list()
 
         if self.program_block:
             self.program_block = False
@@ -296,7 +296,7 @@ class Syntax(object):
     '''
 
     def sequence(self, sym_list):
-        temp_list = self.intermediate.emptylist()
+        temp_list = self.intermediate.empty_list()
 
         self.statement(temp_list)
 
@@ -374,7 +374,7 @@ class Syntax(object):
 
     def assignment_statement(self, sym_list):
         variable_id = ''
-        attr = self.intermediate.emptyattr()
+        attr = self.intermediate.empty_attr()
         if self.token == Token.ALPHANUM:
             variable_id = self.get_lexer_buffer()
             statement = self.lookup(variable_id)
@@ -406,9 +406,9 @@ class Syntax(object):
     '''
 
     def if_statement(self, sym_list):
-        s1 = self.intermediate.emptylist()
-        tail = self.intermediate.emptylist()
-        attr = self.intermediate.emptyattr()
+        s1 = self.intermediate.empty_list()
+        tail = self.intermediate.empty_list()
+        attr = self.intermediate.empty_attr()
         if self.token == KnownState.IF:
             self.run_lexer()
 
@@ -440,7 +440,7 @@ class Syntax(object):
             self.error_handler("if expected", "id statement")
 
     def elsepart(self, tail):
-        s2 = self.intermediate.emptylist()
+        s2 = self.intermediate.empty_list()
         if self.token == KnownState.ELSE:
             self.run_lexer()
             self.brack_or_statement(s2)
@@ -454,8 +454,8 @@ class Syntax(object):
     '''
 
     def while_statement(self, sym_list):
-        attr = self.intermediate.emptyattr()
-        s1 = self.intermediate.emptylist()
+        attr = self.intermediate.empty_attr()
+        s1 = self.intermediate.empty_list()
         exitlist = None
 
         if self.token == KnownState.WHILE:
@@ -482,8 +482,8 @@ class Syntax(object):
             self.error_handler("expected while statement.", "while statement")
 
     def do_while_statement(self, sym_list):
-        attr = self.intermediate.emptyattr()
-        s1 = self.intermediate.emptylist()
+        attr = self.intermediate.empty_attr()
+        s1 = self.intermediate.empty_list()
         exitlist = None
 
         if self.token == KnownState.DO:
@@ -601,7 +601,7 @@ class Syntax(object):
     '''
 
     def print_statement(self):
-        attr = self.intermediate.emptyattr()
+        attr = self.intermediate.empty_attr()
         if self.token == KnownState.PRINT:
             self.run_lexer()
             if self.token == Token.LEFTPAR:
@@ -693,7 +693,7 @@ class Syntax(object):
     '''
 
     def actual_par_item(self, name, item_count, item):
-        attr = self.intermediate.emptyattr()
+        attr = self.intermediate.empty_attr()
         temp = self.lookup(name)
         args = self.intermediate.Entry(name, temp.type_data.func_type)
 
@@ -728,8 +728,8 @@ class Syntax(object):
     '''
 
     def expression(self, attr):
-        attr1 = self.intermediate.emptyattr()
-        attr2 = self.intermediate.emptyattr()
+        attr1 = self.intermediate.empty_attr()
+        attr2 = self.intermediate.empty_attr()
 
         self.optional_sign(attr1)
 
@@ -765,8 +765,8 @@ class Syntax(object):
     '''
 
     def term(self, attr):
-        attr1 = self.intermediate.emptyattr()
-        attr2 = self.intermediate.emptyattr()
+        attr1 = self.intermediate.empty_attr()
+        attr2 = self.intermediate.empty_attr()
 
         self.factor(attr1)
 
@@ -785,7 +785,7 @@ class Syntax(object):
     '''
 
     def factor(self, attr):
-        attr1 = self.intermediate.emptyattr()
+        attr1 = self.intermediate.empty_attr()
         if self.token == Token.NUM:
             if int(self.get_lexer_buffer()) > 32767 or int(self.get_lexer_buffer()) < -32768:
                 self.error_handler("number out of range [-32768, 32767].", "factor")
@@ -833,8 +833,8 @@ class Syntax(object):
     '''
 
     def condition(self, attr):
-        attr1 = self.intermediate.emptyattr()
-        attr2 = self.intermediate.emptyattr()
+        attr1 = self.intermediate.empty_attr()
+        attr2 = self.intermediate.empty_attr()
         self.bool_term(attr1)
         attr.true = attr1.true
         attr.false = attr1.false
@@ -852,8 +852,8 @@ class Syntax(object):
     '''
 
     def bool_term(self, attr):
-        attr1 = self.intermediate.emptyattr()
-        attr2 = self.intermediate.emptyattr()
+        attr1 = self.intermediate.empty_attr()
+        attr2 = self.intermediate.empty_attr()
         self.bool_factor(attr1)
         attr.true = attr1.true
         attr.false = attr1.false
@@ -871,9 +871,9 @@ class Syntax(object):
     '''
 
     def bool_factor(self, attr):
-        attr1 = self.intermediate.emptyattr()
-        attr2 = self.intermediate.emptyattr()
-        m_attr = self.intermediate.emptyattr()
+        attr1 = self.intermediate.empty_attr()
+        attr2 = self.intermediate.empty_attr()
+        m_attr = self.intermediate.empty_attr()
         if self.token == KnownState.NOT:
             self.run_lexer()
             if self.token == Token.LEFTSBRACK:
@@ -902,9 +902,9 @@ class Syntax(object):
             self.expression(attr1)
             operator = self.relational_operator()
             self.expression(attr2)
-            attr.true = self.intermediate.makelist(str(self.intermediate.next_quad()))
+            attr.true = self.intermediate.make_list(str(self.intermediate.next_quad()))
             self.intermediate.gen_quad(operator, attr1.place, attr2.place, "_")
-            attr.false = self.intermediate.makelist(str(self.intermediate.next_quad()))
+            attr.false = self.intermediate.make_list(str(self.intermediate.next_quad()))
             self.intermediate.gen_quad("jump", "_", "_", "_")
 
     '''

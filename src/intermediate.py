@@ -35,7 +35,7 @@ class Intermediate(object):
         self.symbol_table = symbol_table
 
     def error_handler(self, message, caller):
-        if self.debug == True:
+        if self.debug:
             print "Caller: " + caller
         print message
         exit(0)
@@ -54,7 +54,8 @@ class Intermediate(object):
         self.symbol_table.new_variable(var_id, True)
         return var_id
 
-    def add_quad(self, quads, quad, tail):
+    @staticmethod
+    def add_quad(quads, quad, tail):
         if quads is None:
             quads = quad
             tail = quads
@@ -63,15 +64,18 @@ class Intermediate(object):
             quad.next = quads
             quads = quad
 
-    def emptylist(self):
+    def empty_list(self):
         return QuadList(None)
 
-    def emptyattr(self):
+    @staticmethod
+    def empty_attr():
         return BoolAttr()
 
-    def makelist(self, x):
+    @staticmethod
+    def make_list(self, x):
         return QuadList(x)
 
+    @staticmethod
     def merge(self, list1, list2):
         if list1 is None:
             return list2
