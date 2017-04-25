@@ -49,7 +49,7 @@ class Intermediate(object):
         return quad
 
     def new_temp(self):
-        var_id = 'temp' + self.temp_id
+        var_id = 'temp' + str(self.temp_id)
         self.temp_id = self.temp_id + 1
         self.symbol_table.new_variable(var_id, True)
         return var_id

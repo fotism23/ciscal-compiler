@@ -98,7 +98,7 @@ class Symbol(object):
         symbol = Entry(name, entry_type)
 
         symbol.offset = self.current_scope.frame_length
-        self.current_scope.framel_ength = self.current_scope.frame_length + 4
+        self.current_scope.frame_length = self.current_scope.frame_length + 4
 
         if lookup_entry is not None:
             if lookup_entry.level == self.current_scope.nesting_level:

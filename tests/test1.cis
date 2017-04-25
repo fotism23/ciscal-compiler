@@ -3,7 +3,7 @@ program test {
 		sum, i, j
     enddeclare
 
-    procedure test1(in a, in b, inout sum){
+    procedure mpla(in a, in b, inout sum){
         print(a);
         print(b);
         sum := a + b;

@@ -109,11 +109,10 @@ class Syntax(object):
 
     def id_section(self):
         if self.token == Token.ALPHANUM and self.program_block:
-
             self.program_id = self.get_lexer_buffer()
             self.run_lexer()
             return self.program_id
-        if self.token == Token.ALPHANUM:
+        elif self.token == Token.ALPHANUM and not self.program_block:
             name = self.get_lexer_buffer()
             self.run_lexer()
             return name
