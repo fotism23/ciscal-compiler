@@ -1,4 +1,4 @@
-program test {
+program test{
     declare
 	    sum, i, j
     enddeclare
@@ -10,11 +10,11 @@ program test {
     }
 
     i := 0;
-    while(i<0){
+    do{
         j := 2*i;
-        call test(in i, in j, inout sum);
+        call mpla(in i, in j, inout sum);
         i := i+1;
-    }
+    }while(i<0)
     print(sum);
 }
         

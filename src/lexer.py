@@ -38,7 +38,8 @@ class Lexer(object):
         @return : True if the parameter is Alpha-type character. False if Not.
     '''
 
-    def is_alpha(self, char):
+    @staticmethod
+    def is_alpha(char):
         return ((char >= 'A') and (char <= 'Z')) or ((char >= 'a') and (char <= 'z')) or (char == '_')
 
     '''
@@ -47,11 +48,12 @@ class Lexer(object):
         @return : True if the parameter is Num-type character. False if Not.
     '''
 
-    def is_num(self, char):
+    @staticmethod
+    def is_num(char):
         return (char >= '0') and (char <= '9')
 
     '''
-        @name is_allhanum
+        @name is_alphanum
         @param char : character read from the source code string.
         @return : True if the parameter is Alphanum-type character. False if Not.
     '''
@@ -65,7 +67,8 @@ class Lexer(object):
         @return: True if the parameter is White-type character. False if Not.
     '''
 
-    def is_white(self, char):
+    @staticmethod
+    def is_white(char):
         return (char is '\n') or (char is ' ') or (char is '\t')
 
     '''
@@ -74,7 +77,8 @@ class Lexer(object):
         @return: True if the parameter is operator-type character. False if Not.
     '''
 
-    def is_operator(self, char):
+    @staticmethod
+    def is_operator(char):
         return (char is '+') or (char is '-') or (char is '*') or (char is '/')
 
     '''

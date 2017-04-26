@@ -338,7 +338,7 @@ class Syntax(object):
             self.if_statement(sym_list)
             self.intermediate.backpatch(sym_list, str(self.intermediate.next_quad()))
         elif self.token == KnownState.DO:
-            self.while_statement(sym_list)
+            self.do_while_statement(sym_list)
             sym_list.next = None
         elif self.token == KnownState.EXIT:
             self.exit_statement()
@@ -615,7 +615,7 @@ class Syntax(object):
                 item = self.lookup(name)
                 if item is None or (item is not None and item.type != Lang.TYPE_FUNC):
                     self.error_handler(name + " no such procedure.", "call statement")
-                if item.type != Lang.FUNC_TYPE_PROG:
+                if item.type_data.func_type != Lang.FUNC_TYPE_PROC:
                     self.error_handler(name + " is not a procedure.", "call statement")
                 self.run_lexer()
                 self.actual_pars(name)
@@ -649,11 +649,11 @@ class Syntax(object):
     def actual_pars_list(self, name):
         temp = self.lookup(name)
         m_from = int(self.intermediate.next_quad()) - 1
-        item = self.intermediate.Quad(None)
+        item = self.intermediate.empty_quad()
         item_count = 1
-        item_list = self.intermediate.QuadList(None)
+        item_list = self.intermediate.empty_list()
         quad = None
-        tail = self.intermediate.Quad(None)
+        tail = self.intermediate.empty_quad()
 
         self.actual_par_item(name, item_count, item)
         self.intermediate.addquad(item, item_list, tail)
@@ -680,7 +680,7 @@ class Syntax(object):
     def actual_par_item(self, name, item_count, item):
         attr = self.intermediate.empty_attr()
         temp = self.lookup(name)
-        args = self.intermediate.Entry(name, temp.type_data.func_type)
+        args = self.symbol_table.new_entry(name, temp.type_data.func_type)
 
         if item_count > temp.type_data.arg_num:
             self.error_handler("wrong number of arguments", "actual_par_item")

@@ -58,8 +58,13 @@ class Intermediate(object):
     def add_quad(quads, quad):
         quads.append(quad)
 
-    def empty_list(self):
+    @staticmethod
+    def empty_list():
         return QuadList(None)
+
+    @staticmethod
+    def empty_quad():
+        return Quad(None, None, None, None)
 
     @staticmethod
     def empty_attr():

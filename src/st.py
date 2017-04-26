@@ -52,6 +52,7 @@ class Symbol(object):
         self.offset = 0
         self.current_scope = None
         self.global_scope = None
+        self.scopes = []
         self.debug = debug
         self.quad_label = 0
 
@@ -60,6 +61,10 @@ class Symbol(object):
             print "Caller: " + caller
         print message
         exit(0)
+
+    @staticmethod
+    def new_entry(name, type):
+        return Entry(name, type)
 
     def push_scope(self, name):
         scope = Scope(self.level, name)
@@ -74,6 +79,7 @@ class Symbol(object):
         if self.current_scope is None:
             self.current_scope = scope
             self.global_scope = self.current_scope
+            self.scopes.append(self.current_scope)
         else:
             self.current_scope = scope
 
@@ -83,15 +89,16 @@ class Symbol(object):
             if not self.current_scope.parent_entry.type_data.has_return and self.current_scope.parent_entry.type_data.func_type == Lang.FUNC_TYPE_FUNC:
                 self.error_handler("function " + self.current_scope.from_entry.name + " has no return statement", "pop_scope")
 
-        if self.current_scope.prev is not None:
-            self.current_scope.prev.next = None
-            self.current_scope = self.current_scope.prev
-            cur = self.current_scope.entries
+        if self.scopes[len(self.scopes) - 1] is not None:
+            self.current_scope = self.scopes.pop()
+            cur = self.current_scope.children_entries[0]
 
+            '''
             while cur is not None:
                 if cur.type == Lang.TYPE_FUNC:
-                    arg = cur.type_data.arguments[cur.type_data.arguments.length - 1]
+                    arg = cur.type_data.arguments.pop()
                 cur = cur.next
+            '''
 
     def add_symbol(self, symbol):
         # TODO : add symbol
