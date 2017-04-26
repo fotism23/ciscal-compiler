@@ -311,7 +311,7 @@ class Syntax(object):
             else:
                 self.error_handler("} expected", "brackets sequence")
         else:
-            self.error_handler("{ expexted", "brackets sequence")
+            self.error_handler("{ expected", "brackets sequence")
 
     '''
         @name brack_or_statement - Brack or Statement Rule.
