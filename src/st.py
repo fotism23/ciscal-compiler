@@ -38,8 +38,10 @@ class Scope:
     def __init__(self, nesting_level, name):
         self.name = name
         self.nesting_level = nesting_level
+
         self.encl_scope = None
         self.frame_length = 0
+
         self.caller = None
 
         self.parent_entry = None
@@ -158,6 +160,14 @@ class Symbol(object):
         symbol.offset = self.current_scope.frame_length
 
         symbol.type_data = Argument(par_type)
+        symbol.type = par_type
+        self.current_scope.parent_entry.type_data.arg_num = self.current_scope.parent_entry.type_data.arg_num + 1
+        symbol.type_data.arg_num = self.current_scope.parent_entry.type_data.arg_num
+        func = self.current_scope.parent_entry
+
+        symbol.type_data.func = func
+        func.type_data.arguments.append(symbol)
+        # self.current_scope.type_data.arguments.append(symbol)
         # symbol.type_data.type = par_type
         # symbol.type_data.func = self.current_scope.prev.entries
 

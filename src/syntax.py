@@ -545,7 +545,6 @@ class Syntax(object):
         @name exit_statement - Exit Statement Rule.
         @return: Null.
     '''
-
     def exit_statement(self):
         if self.token == KnownState.EXIT:
             if not self.in_while:
@@ -558,7 +557,6 @@ class Syntax(object):
         @name return_statement - Return Statement Rule.
         @return: Null.
     '''
-
     def return_statement(self, attr):
         # todo fix
         if self.symbol_table.current_scope.encl_scope is None or self.symbol_table.caller.type is Lang.TYPE_FUNC:
@@ -585,7 +583,6 @@ class Syntax(object):
         @name print_statement - Print Statement Rule.
         @return: Null.
     '''
-
     def print_statement(self):
         attr = self.intermediate.empty_attr()
         if self.token == KnownState.PRINT:
@@ -607,7 +604,6 @@ class Syntax(object):
         @name call_statement - Call Statement Rule.
         @return: Null.
     '''
-
     def call_statement(self):
         if self.token == KnownState.CALL:
             self.run_lexer()
@@ -630,7 +626,6 @@ class Syntax(object):
         @name actual_pars - ActualPars Rule.
         @return: Null.
     '''
-
     def actual_pars(self, name):
         if self.token == Token.LEFTPAR:
             self.run_lexer()
@@ -640,23 +635,26 @@ class Syntax(object):
             else:
                 self.error_handler(") expected.", "actual_pars")
         else:
-            self.error_handler("( expected.", "actual_pars")
+            temp = self.lookup(name)
+            if temp.type_data.arg_num > 0:
+                self.error_handler("wrong number of arguments.", "actual_pars")
 
     '''
         @name actual_pars_list - ActualPars List Rule.
         @return: Null.
     '''
-
     def actual_pars_list(self, name):
-        temp = self.lookup(name)
-        m_from = int(self.intermediate.next_quad()) - 1
         item = self.intermediate.empty_quad()
-        item_count = 1
+        item_count = 0
         item_list = self.intermediate.empty_list(name)
         quad = None
         tail = self.intermediate.empty_quad()
 
+        temp = self.lookup(name)
+        m_from = int(self.intermediate.next_quad()) - 1
+
         self.actual_par_item(name, item_count, item)
+        item_count = item_count + 1
         self.intermediate.add_quad(item_list, item)
 
         while self.token == Token.COMMA:
@@ -664,12 +662,12 @@ class Syntax(object):
             item_count = item_count + 1
             self.actual_par_item(name, item_count, item)
             quad = item
-            self.intermediate.addquad(item, item_list)
-
+            self.intermediate.add_quad(item_list, item)
+        '''
         quad = tail
         while quad is not None:
-            self.intermediate.addquad(quad, self.intermediate.quads, tail)
-
+            self.intermediate.add_quad(self.intermediate.quads, quad)
+        '''
         if item_count != temp.type_data.arg_num:
             self.error_handler("wrong number of arguments", "actual_pars_list")
 
@@ -677,19 +675,30 @@ class Syntax(object):
         @name actual_par_item - ActualPars Item Rule.
         @return: Null.
     '''
-
     def actual_par_item(self, name, item_count, item):
         attr = self.intermediate.empty_attr()
+
         temp = self.lookup(name)
         args = self.symbol_table.new_entry(name, Lang.TYPE_ARG)
 
-        args = temp.type_data.arguments[0]
+        if item_count > temp.type_data.arg_num:
+            self.error_handler("wrong number of arguments", "actual_par_item")
+        # args = temp.type_data.arguments[0]
+        # args = temp.type_data.arguments[len(temp.type_data.arguments) - 1]
+
+        # args = temp.type_data.arguments.pop(0)
+        # args = temp.type_data.arguments[item_count]
+        args = temp.type_data.arguments.pop(0)
 
         if self.token == KnownState.IN:
+            if args.type != Lang.PARAMETER_TYPE_IN:
+                self.error_handler("passing argument " + str(item_count) + " by value", "actual_par_item")
             self.run_lexer()
             self.expression(attr)
             item = self.intermediate.gen_quad("par", "CV", attr.place, "_")
         elif self.token == KnownState.INOUT:
+            if args.type != Lang.PARAMETER_TYPE_INOUT:
+                self.error_handler("passing argument " + str(item_count) + " by reference", "actual_par_item")
             self.run_lexer()
             if self.token == Token.ALPHANUM:
                 name = self.get_lexer_buffer()
@@ -697,7 +706,7 @@ class Syntax(object):
                 if symbol is None:
                     self.error_handler(name + " no such variable.", "actual_par item")
 
-                item = self.intermediate.newquad("par", "REF", self.get_lexer_buffer(), "_")
+                item = self.intermediate.gen_quad("par", "REF", self.get_lexer_buffer(), "_")
                 self.run_lexer()
             else:
                 self.error_handler("expected id.", "actual_par item")
@@ -708,7 +717,6 @@ class Syntax(object):
         @name expression - Expression Rule.
         @return: Null.
     '''
-
     def expression(self, attr):
         attr1 = self.intermediate.empty_attr()
         attr2 = self.intermediate.empty_attr()
