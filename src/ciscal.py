@@ -91,14 +91,14 @@ def main(argv):
     get_program_parameters(argv)
     read_input_file()
 
-    mlexer = lexer.Lexer(debug)
-    mlexer.init_lexer(source_content)
+    m_lexer = lexer.Lexer(debug)
+    m_lexer.init_lexer(source_content)
 
-    msymbol = st.Symbol(debug)
-    minter = intermediate.Intermediate(debug, msymbol)
+    m_symbol = st.Symbol(debug)
+    m_inter = intermediate.Intermediate(debug, m_symbol)
 
-    msyntax = syntax.Syntax(mlexer, msymbol, minter)
-    msyntax.run_syntax()
+    m_syntax = syntax.Syntax(m_lexer, m_symbol, m_inter)
+    m_syntax.run_syntax()
 
 
 if __name__ == "__main__":

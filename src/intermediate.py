@@ -2,12 +2,12 @@
 
 
 class Quad(object):
-    def __init__(self, operator, x, y, z, label):
+    def __init__(self, operator, x, y, z):
         self.operator = operator
         self.x = x
         self.y = y
         self.z = z
-        self.label = label
+        self.label = None
         self.next = None
         self.prev = None
 
@@ -28,7 +28,7 @@ class QuadList(object):
 class Intermediate(object):
     def __init__(self, debug, symbol_table):
         self.quad_label = 1
-        self.quads = None
+        self.quads = []
         self.quad_list = None
         self.debug = debug
         self.temp_id = 0
@@ -45,7 +45,7 @@ class Intermediate(object):
 
     def gen_quad(self, operator, x, y, z):
         quad = Quad(operator, x, y, z)
-        self.add_quad(quad, self.quads, None)
+        self.add_quad(self.quads, quad)
         return quad
 
     def new_temp(self):
@@ -55,14 +55,8 @@ class Intermediate(object):
         return var_id
 
     @staticmethod
-    def add_quad(quads, quad, tail):
-        if quads is None:
-            quads = quad
-            tail = quads
-        else:
-            quads.prev = quad
-            quad.next = quads
-            quads = quad
+    def add_quad(quads, quad):
+        quads.append(quad)
 
     def empty_list(self):
         return QuadList(None)

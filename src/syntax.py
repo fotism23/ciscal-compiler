@@ -40,9 +40,6 @@ class Syntax(object):
     def get_lexer_line(self):
         return self.m_lexer.get_current_line()
 
-    def lookup(self, lookup_id):
-        return self.symbol_table.lookup(lookup_id)
-
     '''
         @name error_handler - Prints the error to the console and exits.
         @param message : Error message from the module that found error.
@@ -50,7 +47,7 @@ class Syntax(object):
     '''
 
     def error_handler(self, message, caller):
-        if self.debug == True:
+        if self.debug:
             print "Caller: " + caller
         print "Syntax Error line " + str(self.m_lexer.get_current_line()) + " : " + message
         exit(0)
@@ -65,27 +62,30 @@ class Syntax(object):
         self.program()
 
     '''
-        @name new_variable - !!!Not yet implemented at this stage.
-        @name - Variable name.
-        @return: Null.
+        Symbol Table help functions.
     '''
+
+    def lookup(self, lookup_id):
+        return self.symbol_table.lookup(lookup_id)
 
     def new_variable(self, name, temp):
         self.symbol_table.new_variable(name, temp)
 
-    '''
-        @name new_function - !!!Not yet implemented at this stage.
-        @name - Function name.
-        @return: Null.
-    '''
-
     def new_function(self, name, func_type):
         self.symbol_table.new_function(name, func_type)
-        pass
+
+    def push_scope(self, scope):
+        self.symbol_table.push_scope(scope)
+
+    def pop_scope(self):
+        return self.symbol_table.pop_scope()
+
+    def add_argument(self, name, formal_par_item_type):
+        self.symbol_table.add_argument(name, formal_par_item_type)
 
     '''
         Syntax rules functions Start.
-        Runs lexer and proccess the returned token following ciscla's Grammar.
+        Runs lexer and process the returned token following ciscla's Grammar.
         If the token doesn't match the rules an error is thrown.
     '''
 
@@ -93,7 +93,6 @@ class Syntax(object):
         @name program - Program Rule.
         @return: Null.
     '''
-
     def program(self):
         if self.token == KnownState.PROGRAM:
             self.run_lexer()
@@ -106,7 +105,6 @@ class Syntax(object):
         @name id_section - Program ID Rule.
         @return: Null.
     '''
-
     def id_section(self):
         if self.token == Token.ALPHANUM and self.program_block:
             self.program_id = self.get_lexer_buffer()
@@ -123,9 +121,7 @@ class Syntax(object):
         @name subprogram - Subprograms Rule.
         @return: Null.
     '''
-
     def subprogram(self):
-        function_type = ''
         if self.token == KnownState.PROCEDURE or self.token == KnownState.FUNCTION:
             if self.token == KnownState.PROCEDURE:
                 function_type = Lang.FUNC_TYPE_PROC
@@ -141,7 +137,6 @@ class Syntax(object):
         @param block_name - Block name.
         @return: Null.
     '''
-
     def block(self, block_name):
         sym_list = self.intermediate.empty_list()
 
@@ -149,22 +144,25 @@ class Syntax(object):
             self.program_block = False
 
             if self.token == Token.LEFTCBRACK:
-                self.symbol_table.push_scope(block_name)
+                self.push_scope(block_name)
+
                 self.new_function(block_name, Lang.FUNC_TYPE_PROG)
                 self.run_lexer()
                 self.declarations()
                 self.subprogram()
 
-                temp = self.symbol_table.lookup(block_name)
+                temp = self.lookup(block_name)
+                # todo : fix
                 temp.type_data.start_quad_id = self.symbol_table.quad_label
 
+                # todo : fix
                 self.start_quad = self.symbol_table.quad_label
                 self.intermediate.gen_quad("begin_block", self.program_id, "_", "_")
 
                 self.sequence(sym_list)
 
                 if self.token == Token.RIGHTCBRACK:
-                    self.symbol_table.pop_scope()
+                    self.pop_scope()
                     self.run_lexer()
                 else:
                     self.error_handler("} expected", "block (program)")
@@ -179,15 +177,16 @@ class Syntax(object):
                 self.declarations()
                 self.subprogram()
 
-                temp = self.symbol_table.lookup(block_name)
-                temp.type_data.start_quad_id = self.symbol_table.quad_label
+                temp = self.lookup(block_name)
+                # todo : fix
+                #temp.type_data.start_quad_id = self.symbol_table.quad_label
 
                 self.intermediate.gen_quad("begin_block", self.program_id, "_", "_")
 
                 self.sequence(sym_list)
 
                 if self.token == Token.RIGHTCBRACK:
-                    self.symbol_table.pop_scope()
+                    self.pop_scope()
                     self.run_lexer()
                 else:
                     self.error_handler("} expected", "block")
@@ -200,8 +199,7 @@ class Syntax(object):
     '''
         @name declarations - Declarations Rule.
         @return: Null.
-    '''
-
+     '''
     def declarations(self):
         if self.token == KnownState.DECLARE:
             self.run_lexer()
@@ -215,7 +213,6 @@ class Syntax(object):
         @name var_list - VarList Rule.
         @return: Null.
     '''
-
     def var_list(self):
         if self.token == Token.ALPHANUM:
             self.new_variable(self.get_lexer_buffer(), False)
@@ -226,14 +223,13 @@ class Syntax(object):
                     self.new_variable(self.get_lexer_buffer(), False)
                     self.run_lexer()
                 else:
-                    self.error_handler("ID expected", "varlist")
+                    self.error_handler("ID expected", "var_list")
 
     '''
         @name function_body - Function Body Rule.
         @func_name - Function id.
         @return: Null.
     '''
-
     def function_body(self, func_name):
         self.formal_pars()
         self.block(func_name)
@@ -242,7 +238,6 @@ class Syntax(object):
         @name formal_pars - FormalPars Rule.
         @return: Null.
     '''
-
     def formal_pars(self):
         if self.token == Token.LEFTPAR:
             self.run_lexer()
@@ -256,7 +251,6 @@ class Syntax(object):
         @name formal_pars_list - FormalPars List Rule.
         @return: Null.
     '''
-
     def formal_pars_list(self):
         self.formal_par_item()
 
@@ -268,9 +262,7 @@ class Syntax(object):
         @name formal_par_item - FormalPars Item Rule.
         @return: Null.
     '''
-
     def formal_par_item(self):
-        formal_par_item_type = -1
 
         if self.token == KnownState.IN or self.token == KnownState.INOUT:
             if self.token == KnownState.IN:
@@ -283,18 +275,16 @@ class Syntax(object):
 
             item = self.lookup(name)
             if item is not None and item.type == Lang.TYPE_FUNC:
-                self.error_handler(name + "function already exists.", "formalpar item")
-            self.symbol_table.add_argument(name, formal_par_item_type)
+                self.error_handler(name + "function already exists.", "formal_par item")
+            self.add_argument(name, formal_par_item_type)
 
         else:
-            self.error_handler("in id or inout id expected", "formalpar item")
-
+            self.error_handler("in id or inout id expected", "formal_par item")
 
     '''
         @name sequence - Sequence Rule.
         @return: Null.
     '''
-
     def sequence(self, sym_list):
         temp_list = self.intermediate.empty_list()
 
@@ -311,7 +301,6 @@ class Syntax(object):
         @name brackets_sequence - Brackets Sequence Rule.
         @return: Null.
     '''
-
     def brackets_sequence(self, sym_list):
         if self.token == Token.LEFTCBRACK:
             self.run_lexer()
@@ -327,7 +316,6 @@ class Syntax(object):
         @name brack_or_statement - Brack or Statement Rule.
         @return: Null.
     '''
-
     def brack_or_statement(self, sym_list):
         if self.token == Token.LEFTCBRACK:
             self.brackets_sequence(sym_list)
@@ -341,7 +329,6 @@ class Syntax(object):
         @name statement - Statement Rule.
         @return: Null.
     '''
-
     def statement(self, sym_list):
 
         if self.token == Token.ALPHANUM:
@@ -371,9 +358,7 @@ class Syntax(object):
         @name assignment_statement - Assignment Statement Rule.
         @return: Null.
     '''
-
     def assignment_statement(self, sym_list):
-        variable_id = ''
         attr = self.intermediate.empty_attr()
         if self.token == Token.ALPHANUM:
             variable_id = self.get_lexer_buffer()
@@ -404,7 +389,6 @@ class Syntax(object):
         @name if_statement - If Assignment Statement Rule.
         @return: Null.
     '''
-
     def if_statement(self, sym_list):
         s1 = self.intermediate.empty_list()
         tail = self.intermediate.empty_list()
@@ -452,7 +436,6 @@ class Syntax(object):
         @name while_statement - While Statement Rule.
         @return: Null.
     '''
-
     def while_statement(self, sym_list):
         attr = self.intermediate.empty_attr()
         s1 = self.intermediate.empty_list()
@@ -575,6 +558,7 @@ class Syntax(object):
     '''
 
     def return_statement(self, attr):
+        # todo fix
         if self.symbol_table.current_scope.encl_scope is None or self.symbol_table.caller.type is Lang.TYPE_FUNC:
             self.error_handler("return statement out of function", "return_statement")
         else:

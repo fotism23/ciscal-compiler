@@ -1,6 +1,6 @@
 program test {
     declare
-	sum, i, j
+	    sum, i, j
     enddeclare
 
     procedure mpla(in a, in b, inout sum){

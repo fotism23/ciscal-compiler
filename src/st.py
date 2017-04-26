@@ -7,27 +7,25 @@ class Entry(object):
     def __init__(self, name, entry_type):
         self.type = entry_type
         self.name = name
-        self.next = None
         self.type_data = None
-        self.level = 0
         self.offset = 0
+        self.level = 0
 
 
 class Function(object):
     def __init__(self, func_type):
-        self.type = func_type
-        self.framelength = 0
+        self.func_type = func_type
+        self.frame_length = 0
         self.arguments = []
         self.start_quad_id = -1
         self.has_return = False
-        self.arg_num = 0
+        self.arg_num = len(self.arguments)
 
 
 class Argument(object):
     def __init__(self, arg_type):
         self.type = arg_type
         self.offset = 0
-        self.next_arg = None
         self.func = None
 
 
@@ -39,13 +37,13 @@ class Variable(object):
 class Scope:
     def __init__(self, nesting_level, name):
         self.name = name
-        self.entries = []
         self.nesting_level = nesting_level
         self.encl_scope = None
         self.frame_length = 0
         self.caller = None
-        self.prev = None
-        self.next = None
+
+        self.parent_entry = None
+        self.children_entries = []
 
 
 class Symbol(object):
@@ -66,7 +64,6 @@ class Symbol(object):
     def push_scope(self, name):
         scope = Scope(self.level, name)
         self.level = self.level + 1
-        encl_scope = None
 
         if self.current_scope is not None:
             encl_scope = self.lookup(name)
@@ -82,12 +79,30 @@ class Symbol(object):
 
     def pop_scope(self):
         # TODO : pop scope
-        pass
+        if self.current_scope.from_entry is not None:
+            if not self.current_scope.from_entry.type_data.has_return and self.current_scope.from_entry.type_data.type == Lang.FUNC_TYPE_FUNC:
+                self.error_handler("function " + self.current_scope.from_entry.name + " has no return statement", "pop_scope")
+
+        if self.current_scope.prev is not None:
+            self.current_scope.prev.next = None
+            self.current_scope = self.current_scope.prev
+            cur = self.current_scope.entries
+
+            while cur is not None:
+                if cur.type == Lang.TYPE_FUNC:
+                    arg = cur.type_data.arguments[cur.type_data.arguments.length - 1]
+                cur = cur.next
+
 
     def add_symbol(self, symbol):
         # TODO : add symbol
         pass
 
+    '''
+        @name new_variable - !!!Not yet implemented at this stage.
+        @name - Variable name.
+        @return: Null.
+    '''
     def new_variable(self, name, temp):
         lookup_entry = self.lookup(name)
 
@@ -111,6 +126,11 @@ class Symbol(object):
 
         self.add_symbol(symbol)
 
+    '''
+        @name new_function - !!!Not yet implemented at this stage.
+        @name - Function name.
+        @return: Null.
+    '''
     def new_function(self, name, func_type):
         if self.lookup(name) is not None:
             self.error_handler("Function " + name + " has been declared", "new function")
@@ -127,17 +147,22 @@ class Symbol(object):
 
         symbol.type_data = Argument(par_type)
         #symbol.type_data.type = par_type
-        symbol.type_data.next_arg = None
-        symbol.type_data.func = self.current_scope.prev.entries
+        #symbol.type_data.func = self.current_scope.prev.entries
 
         symbol.level = self.current_scope.nesting_level
         self.current_scope.frame_length = self.current_scope.frame_length + 4
         self.add_symbol(symbol)
 
+    '''
+        @name lookup - Checks if symbol_table contains an entry with a name.
+        @name name - Entry name.
+        @return - Entry if found. None otherwise.
+    '''
+
     def lookup(self, name):
         current_scope = self.current_scope
         while current_scope is not None:
-            for sym in current_scope.entries:
+            for sym in current_scope.children_entries:
                 if str(name) is sym.name:
                     return sym
             current_scope = current_scope.encl_scope
