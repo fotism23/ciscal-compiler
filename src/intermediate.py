@@ -21,14 +21,14 @@ class BoolAttr(object):
 
 class QuadList(object):
     def __init__(self, name):
-        self.next = None
+        self.data = []
         self.name = name
 
 
 class Intermediate(object):
     def __init__(self, debug, symbol_table):
         self.quad_label = 1
-        self.quads = []
+        self.quads = QuadList("main")
         self.quad_list = None
         self.debug = debug
         self.temp_id = 0
@@ -56,11 +56,11 @@ class Intermediate(object):
 
     @staticmethod
     def add_quad(quads, quad):
-        quads.append(quad)
+        quads.data.append(quad)
 
     @staticmethod
-    def empty_list():
-        return QuadList(None)
+    def empty_list(name):
+        return QuadList(name)
 
     @staticmethod
     def empty_quad():

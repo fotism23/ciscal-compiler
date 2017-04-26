@@ -78,7 +78,7 @@ class Syntax(object):
         self.symbol_table.push_scope(scope)
 
     def pop_scope(self):
-        return self.symbol_table.pop_scope()
+        self.symbol_table.pop_scope()
 
     def add_argument(self, name, formal_par_item_type):
         self.symbol_table.add_argument(name, formal_par_item_type)
@@ -139,7 +139,7 @@ class Syntax(object):
         @return: Null.
     '''
     def block(self, block_name):
-        sym_list = self.intermediate.empty_list()
+        sym_list = self.intermediate.empty_list(block_name)
 
         if self.program_block:
             self.program_block = False
@@ -180,7 +180,8 @@ class Syntax(object):
 
                 temp = self.lookup(block_name)
                 # todo : fix
-                # temp.type_data.start_quad_id = self.symbol_table.quad_label
+                if temp is not None:
+                    temp.type_data.start_quad_id = self.symbol_table.quad_label
 
                 self.intermediate.gen_quad("begin_block", self.program_id, "_", "_")
 
@@ -194,8 +195,8 @@ class Syntax(object):
             else:
                 self.error_handler("{ expected", "block")
 
-            self.intermediate.backpatch(sym_list.next, str(self.intermediate.next_quad()))
-            self.intermediate.gen_quad("end_block", self.program_id, "_", "_")
+            # self.intermediate.backpatch(sym_list.next, str(self.intermediate.next_quad()))
+            # self.intermediate.gen_quad("end_block", self.program_id, "_", "_")
 
     '''
         @name declarations - Declarations Rule.
@@ -287,16 +288,18 @@ class Syntax(object):
         @return: Null.
     '''
     def sequence(self, sym_list):
-        temp_list = self.intermediate.empty_list()
+        temp_list = self.intermediate.empty_list("temp")
 
         self.statement(temp_list)
-
-        temp = temp_list.next
+        # todo fix
+        # temp = temp_list.data[-1s]
         while self.token == Token.SEMICOL:
             self.run_lexer()
             self.statement(temp_list)
-            temp = self.intermediate.merge(temp, temp_list.next)
-        sym_list.next = temp
+            # todo fix
+            # temp = self.intermediate.merge(temp, temp_list.next)
+        # todo fix
+        # sym_list.append(temp)
 
     '''
         @name brackets_sequence - Brackets Sequence Rule.
@@ -399,7 +402,7 @@ class Syntax(object):
 
             if self.token == Token.LEFTPAR:
                 self.run_lexer()
-                self.condition()
+                self.condition(attr)
                 q1 = self.intermediate.next_quad()
 
                 if self.token == Token.RIGHTPAR:
@@ -440,7 +443,6 @@ class Syntax(object):
     def while_statement(self, sym_list):
         attr = self.intermediate.empty_attr()
         s1 = self.intermediate.empty_list()
-        exitlist = None
 
         if self.token == KnownState.WHILE:
 
@@ -467,8 +469,7 @@ class Syntax(object):
 
     def do_while_statement(self, sym_list):
         attr = self.intermediate.empty_attr()
-        s1 = self.intermediate.empty_list()
-        exitlist = None
+        s1 = self.intermediate.empty_list("while")
 
         if self.token == KnownState.DO:
             p1 = self.intermediate.next_quad()
@@ -651,19 +652,19 @@ class Syntax(object):
         m_from = int(self.intermediate.next_quad()) - 1
         item = self.intermediate.empty_quad()
         item_count = 1
-        item_list = self.intermediate.empty_list()
+        item_list = self.intermediate.empty_list(name)
         quad = None
         tail = self.intermediate.empty_quad()
 
         self.actual_par_item(name, item_count, item)
-        self.intermediate.addquad(item, item_list, tail)
+        self.intermediate.add_quad(item_list, item)
 
         while self.token == Token.COMMA:
             self.run_lexer()
             item_count = item_count + 1
             self.actual_par_item(name, item_count, item)
             quad = item
-            self.intermediate.addquad(item, item_list, tail)
+            self.intermediate.addquad(item, item_list)
 
         quad = tail
         while quad is not None:
@@ -680,18 +681,14 @@ class Syntax(object):
     def actual_par_item(self, name, item_count, item):
         attr = self.intermediate.empty_attr()
         temp = self.lookup(name)
-        args = self.symbol_table.new_entry(name, temp.type_data.func_type)
+        args = self.symbol_table.new_entry(name, Lang.TYPE_ARG)
 
-        if item_count > temp.type_data.arg_num:
-            self.error_handler("wrong number of arguments", "actual_par_item")
-
-        for i in range(0, item_count - 1):
-            args = args.next
+        args = temp.type_data.arguments[0]
 
         if self.token == KnownState.IN:
             self.run_lexer()
             self.expression(attr)
-            item = self.intermediate.newquad("par", "CV", attr.place, "_")
+            item = self.intermediate.gen_quad("par", "CV", attr.place, "_")
         elif self.token == KnownState.INOUT:
             self.run_lexer()
             if self.token == Token.ALPHANUM:

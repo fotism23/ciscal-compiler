@@ -101,7 +101,6 @@ class Symbol(object):
             '''
 
     def add_symbol(self, symbol):
-        # TODO : add symbol
         if symbol.type == Lang.TYPE_FUNC and symbol.type_data.func_type == Lang.FUNC_TYPE_PROG:
             symbol.level = 1
         else:
