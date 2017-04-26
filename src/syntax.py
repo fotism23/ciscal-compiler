@@ -85,7 +85,7 @@ class Syntax(object):
 
     '''
         Syntax rules functions Start.
-        Runs lexer and process the returned token following ciscla's Grammar.
+        Runs lexer and process the returned token following ciscal's Grammar.
         If the token doesn't match the rules an error is thrown.
     '''
 
@@ -130,6 +130,7 @@ class Syntax(object):
             self.run_lexer()
             name = self.id_section()
             self.new_function(name, function_type)
+            self.push_scope(name)
             self.function_body(name)
 
     '''
@@ -179,7 +180,7 @@ class Syntax(object):
 
                 temp = self.lookup(block_name)
                 # todo : fix
-                #temp.type_data.start_quad_id = self.symbol_table.quad_label
+                # temp.type_data.start_quad_id = self.symbol_table.quad_label
 
                 self.intermediate.gen_quad("begin_block", self.program_id, "_", "_")
 
@@ -365,9 +366,9 @@ class Syntax(object):
             statement = self.lookup(variable_id)
 
             if statement is None:
-                self.error_handler(variable_id + " no such variable.", "assignment statement")
+                self.error_handler(variable_id + " no such variable.", "assignment_statement")
             elif (statement.type == Lang.TYPE_FUNC) or (statement.type == Lang.TYPE_CONST):
-                self.error_handler(variable_id + " is not assignable.", "assignment statement")
+                self.error_handler(variable_id + " is not assignable.", "assignment_statement")
 
             self.run_lexer()
 
@@ -379,11 +380,11 @@ class Syntax(object):
                     self.intermediate.gen_quad(":=", attr.place, "_", variable_id)
                     sym_list.next = None
                 else:
-                    self.error_handler("assignment operator ( = ) expected", "assignment statement")
+                    self.error_handler("assignment operator ( = ) expected", "assignment_statement")
             else:
-                self.error_handler("assignment operator ( := ) expected", "assignment statement")
+                self.error_handler("assignment operator ( := ) expected", "assignment_statement")
         else:
-            self.error_handler("expected variable id before assiignment", "assignment statement")
+            self.error_handler("expected variable id before assignment", "assignment_statement")
 
     '''
         @name if_statement - If Assignment Statement Rule.
@@ -831,7 +832,7 @@ class Syntax(object):
             attr.false = attr2.false
 
     '''
-        @name boolterm - Boolterm Rule.
+        @name bool_term - BoolTerm Rule.
         @return: Null.
     '''
 

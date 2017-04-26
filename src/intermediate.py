@@ -66,11 +66,11 @@ class Intermediate(object):
         return BoolAttr()
 
     @staticmethod
-    def make_list(self, x):
+    def make_list(x):
         return QuadList(x)
 
     @staticmethod
-    def merge(self, list1, list2):
+    def merge(list1, list2):
         if list1 is None:
             return list2
         elif list2 is None:

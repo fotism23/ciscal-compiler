@@ -66,10 +66,10 @@ class Symbol(object):
         self.level = self.level + 1
 
         if self.current_scope is not None:
-            encl_scope = self.lookup(name)
-            scope.encl_scope = encl_scope
+            parent_entry = self.lookup(name)
+            scope.parent_entry = parent_entry
         else:
-            scope.encl_scope = None
+            scope.parent_entry = None
 
         if self.current_scope is None:
             self.current_scope = scope
@@ -79,8 +79,8 @@ class Symbol(object):
 
     def pop_scope(self):
         # TODO : pop scope
-        if self.current_scope.from_entry is not None:
-            if not self.current_scope.from_entry.type_data.has_return and self.current_scope.from_entry.type_data.type == Lang.FUNC_TYPE_FUNC:
+        if self.current_scope.parent_entry is not None:
+            if not self.current_scope.parent_entry.type_data.has_return and self.current_scope.parent_entry.type_data.func_type == Lang.FUNC_TYPE_FUNC:
                 self.error_handler("function " + self.current_scope.from_entry.name + " has no return statement", "pop_scope")
 
         if self.current_scope.prev is not None:
@@ -93,10 +93,17 @@ class Symbol(object):
                     arg = cur.type_data.arguments[cur.type_data.arguments.length - 1]
                 cur = cur.next
 
-
     def add_symbol(self, symbol):
         # TODO : add symbol
-        pass
+        if symbol.type == Lang.TYPE_FUNC and symbol.type_data.func_type == Lang.FUNC_TYPE_PROG:
+            symbol.level = 1
+        else:
+            if symbol.type == Lang.TYPE_FUNC:
+                symbol.level = self.current_scope.nesting_level + 1
+            else:
+                symbol.level = self.current_scope.nesting_level
+
+        self.current_scope.children_entries.append(symbol)
 
     '''
         @name new_variable - !!!Not yet implemented at this stage.
@@ -106,7 +113,6 @@ class Symbol(object):
     def new_variable(self, name, temp):
         lookup_entry = self.lookup(name)
 
-        entry_type = -1
         if temp:
             entry_type = Lang.TYPE_TEMP
         else:
@@ -146,8 +152,8 @@ class Symbol(object):
         symbol.offset = self.current_scope.frame_length
 
         symbol.type_data = Argument(par_type)
-        #symbol.type_data.type = par_type
-        #symbol.type_data.func = self.current_scope.prev.entries
+        # symbol.type_data.type = par_type
+        # symbol.type_data.func = self.current_scope.prev.entries
 
         symbol.level = self.current_scope.nesting_level
         self.current_scope.frame_length = self.current_scope.frame_length + 4
@@ -163,7 +169,7 @@ class Symbol(object):
         current_scope = self.current_scope
         while current_scope is not None:
             for sym in current_scope.children_entries:
-                if str(name) is sym.name:
+                if str(name) == sym.name:
                     return sym
             current_scope = current_scope.encl_scope
         return None
