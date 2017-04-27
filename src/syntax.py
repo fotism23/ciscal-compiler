@@ -93,6 +93,7 @@ class Syntax(object):
         @name program - Program Rule.
         @return: Null.
     '''
+
     def program(self):
         if self.token == KnownState.PROGRAM:
             self.run_lexer()
@@ -105,6 +106,7 @@ class Syntax(object):
         @name id_section - Program ID Rule.
         @return: Null.
     '''
+
     def id_section(self):
         if self.token == Token.ALPHANUM and self.program_block:
             self.program_id = self.get_lexer_buffer()
@@ -121,6 +123,7 @@ class Syntax(object):
         @name subprogram - Subprograms Rule.
         @return: Null.
     '''
+
     def subprogram(self):
         if self.token == KnownState.PROCEDURE or self.token == KnownState.FUNCTION:
             if self.token == KnownState.PROCEDURE:
@@ -138,6 +141,7 @@ class Syntax(object):
         @param block_name - Block name.
         @return: Null.
     '''
+
     def block(self, block_name):
         sym_list = self.intermediate.empty_list(block_name)
 
@@ -153,11 +157,9 @@ class Syntax(object):
                 self.subprogram()
 
                 temp = self.lookup(block_name)
-                # todo : fix
-                temp.type_data.start_quad_id = self.symbol_table.quad_label
 
-                # todo : fix
-                self.start_quad = self.symbol_table.quad_label
+                temp.type_data.start_quad_id = self.intermediate.quad_label
+                self.start_quad = self.intermediate.quad_label
                 self.intermediate.gen_quad("begin_block", self.program_id, "_", "_")
 
                 self.sequence(sym_list)
@@ -169,6 +171,8 @@ class Syntax(object):
                     self.error_handler("} expected", "block (program)")
             else:
                 self.error_handler("{ expected", "block")
+
+            # todo fix this
             self.intermediate.backpatch(sym_list.next, str(self.intermediate.next_quad()))
             self.intermediate.gen_quad("halt", "_", "_", "_")
             self.intermediate.gen_quad("end_block", self.program_id, "_", "_")
@@ -181,7 +185,7 @@ class Syntax(object):
                 temp = self.lookup(block_name)
                 # todo : fix
                 if temp is not None:
-                    temp.type_data.start_quad_id = self.symbol_table.quad_label
+                    temp.type_data.start_quad_id = self.intermediate.quad_label
 
                 self.intermediate.gen_quad("begin_block", self.program_id, "_", "_")
 
@@ -195,13 +199,14 @@ class Syntax(object):
             else:
                 self.error_handler("{ expected", "block")
 
-            # self.intermediate.backpatch(sym_list.next, str(self.intermediate.next_quad()))
-            # self.intermediate.gen_quad("end_block", self.program_id, "_", "_")
+            self.intermediate.backpatch(sym_list.next, str(self.intermediate.next_quad()))
+            self.intermediate.gen_quad("end_block", self.program_id, "_", "_")
 
     '''
         @name declarations - Declarations Rule.
         @return: Null.
      '''
+
     def declarations(self):
         if self.token == KnownState.DECLARE:
             self.run_lexer()
@@ -215,6 +220,7 @@ class Syntax(object):
         @name var_list - VarList Rule.
         @return: Null.
     '''
+
     def var_list(self):
         if self.token == Token.ALPHANUM:
             self.new_variable(self.get_lexer_buffer(), False)
@@ -232,6 +238,7 @@ class Syntax(object):
         @func_name - Function id.
         @return: Null.
     '''
+
     def function_body(self, func_name):
         self.formal_pars()
         self.block(func_name)
@@ -240,6 +247,7 @@ class Syntax(object):
         @name formal_pars - FormalPars Rule.
         @return: Null.
     '''
+
     def formal_pars(self):
         if self.token == Token.LEFTPAR:
             self.run_lexer()
@@ -253,6 +261,7 @@ class Syntax(object):
         @name formal_pars_list - FormalPars List Rule.
         @return: Null.
     '''
+
     def formal_pars_list(self):
         self.formal_par_item()
 
@@ -264,6 +273,7 @@ class Syntax(object):
         @name formal_par_item - FormalPars Item Rule.
         @return: Null.
     '''
+
     def formal_par_item(self):
 
         if self.token == KnownState.IN or self.token == KnownState.INOUT:
@@ -287,6 +297,7 @@ class Syntax(object):
         @name sequence - Sequence Rule.
         @return: Null.
     '''
+
     def sequence(self, sym_list):
         temp_list = self.intermediate.empty_list("temp")
 
@@ -298,13 +309,14 @@ class Syntax(object):
             self.statement(temp_list)
             # todo fix
             # temp = self.intermediate.merge(temp, temp_list.next)
-        # todo fix
-        # sym_list.append(temp)
+            # todo fix
+            # sym_list.append(temp)
 
     '''
         @name brackets_sequence - Brackets Sequence Rule.
         @return: Null.
     '''
+
     def brackets_sequence(self, sym_list):
         if self.token == Token.LEFTCBRACK:
             self.run_lexer()
@@ -320,6 +332,7 @@ class Syntax(object):
         @name brack_or_statement - Brack or Statement Rule.
         @return: Null.
     '''
+
     def brack_or_statement(self, sym_list):
         if self.token == Token.LEFTCBRACK:
             self.brackets_sequence(sym_list)
@@ -333,6 +346,7 @@ class Syntax(object):
         @name statement - Statement Rule.
         @return: Null.
     '''
+
     def statement(self, sym_list):
 
         if self.token == Token.ALPHANUM:
@@ -344,6 +358,7 @@ class Syntax(object):
             self.do_while_statement(sym_list)
             sym_list.next = None
         elif self.token == KnownState.EXIT:
+            # todo fix this
             self.exit_statement()
         elif self.token == KnownState.RETURN:
             self.return_statement(sym_list)
@@ -362,6 +377,7 @@ class Syntax(object):
         @name assignment_statement - Assignment Statement Rule.
         @return: Null.
     '''
+
     def assignment_statement(self, sym_list):
         attr = self.intermediate.empty_attr()
         if self.token == Token.ALPHANUM:
@@ -381,6 +397,7 @@ class Syntax(object):
                     self.run_lexer()
                     self.expression(attr)
                     self.intermediate.gen_quad(":=", attr.place, "_", variable_id)
+                    # todo fix this
                     sym_list.next = None
                 else:
                     self.error_handler("assignment operator ( = ) expected", "assignment_statement")
@@ -393,6 +410,7 @@ class Syntax(object):
         @name if_statement - If Assignment Statement Rule.
         @return: Null.
     '''
+
     def if_statement(self, sym_list):
         s1 = self.intermediate.empty_list()
         tail = self.intermediate.empty_list()
@@ -408,15 +426,14 @@ class Syntax(object):
                 if self.token == Token.RIGHTPAR:
                     self.run_lexer()
                     self.brack_or_statement(s1)
-                    m_list = self.intermediate.makeList(str(self.intermediate.next_quad()))
+                    m_list = self.intermediate.make_list(str(self.intermediate.next_quad()))
                     self.intermediate.gen_quad("jump", "_", "_", "_")
                     q2 = self.intermediate.next_quad()
                     self.elsepart(tail)
 
-                    # TODO : complete backpatch
-
                     self.intermediate.backpatch(attr.true, str(q1))
                     self.intermediate.backpatch(attr.false, str(q2))
+                    # TODO : fix this
                     sym_list.next = self.intermediate.merge(s1.next, m_list)
                     sym_list.next = self.intermediate.merge(sym_list, tail.next)
 
@@ -440,6 +457,7 @@ class Syntax(object):
         @name while_statement - While Statement Rule.
         @return: Null.
     '''
+
     def while_statement(self, sym_list):
         attr = self.intermediate.empty_attr()
         s1 = self.intermediate.empty_list()
@@ -469,7 +487,7 @@ class Syntax(object):
 
     def do_while_statement(self, sym_list):
         attr = self.intermediate.empty_attr()
-        s1 = self.intermediate.empty_list("while")
+        s1 = self.intermediate.empty_list("do_while")
 
         if self.token == KnownState.DO:
             p1 = self.intermediate.next_quad()
@@ -486,6 +504,7 @@ class Syntax(object):
                     self.intermediate.backpatch(attr.true, str(p1))
                     p2 = self.intermediate.next_quad()
                     self.intermediate.backpatch(attr.true, str(p2))
+                    # todo fix this exitlist
                     if self.token == Token.RIGHTPAR:
                         self.run_lexer()
                         sym_list.next = s1.next
@@ -545,10 +564,11 @@ class Syntax(object):
         @name exit_statement - Exit Statement Rule.
         @return: Null.
     '''
+
     def exit_statement(self):
         if self.token == KnownState.EXIT:
             if not self.in_while:
-                exit()
+                self.error_handler("exit statement out of while statement", "exit_statement")
             self.run_lexer()
         else:
             self.error_handler("exit statement expected.", "exit statement")
@@ -557,12 +577,12 @@ class Syntax(object):
         @name return_statement - Return Statement Rule.
         @return: Null.
     '''
+
     def return_statement(self, attr):
-        # todo fix
-        if self.symbol_table.current_scope.encl_scope is None or self.symbol_table.caller.type is Lang.TYPE_FUNC:
+        if self.symbol_table.current_scope.parent_entry is None or self.symbol_table.current_scope.parent_entry.type is Lang.TYPE_FUNC:
             self.error_handler("return statement out of function", "return_statement")
         else:
-            self.symbol_table.current_scope.caller.data_type.has_return = True
+            self.symbol_table.current_scope.parent_entry.data_type.has_return = True
 
         if self.token == KnownState.RETURN:
             self.run_lexer()
@@ -583,6 +603,7 @@ class Syntax(object):
         @name print_statement - Print Statement Rule.
         @return: Null.
     '''
+
     def print_statement(self):
         attr = self.intermediate.empty_attr()
         if self.token == KnownState.PRINT:
@@ -604,6 +625,7 @@ class Syntax(object):
         @name call_statement - Call Statement Rule.
         @return: Null.
     '''
+
     def call_statement(self):
         if self.token == KnownState.CALL:
             self.run_lexer()
@@ -626,6 +648,7 @@ class Syntax(object):
         @name actual_pars - ActualPars Rule.
         @return: Null.
     '''
+
     def actual_pars(self, name):
         if self.token == Token.LEFTPAR:
             self.run_lexer()
@@ -643,31 +666,32 @@ class Syntax(object):
         @name actual_pars_list - ActualPars List Rule.
         @return: Null.
     '''
+
     def actual_pars_list(self, name):
         item = self.intermediate.empty_quad()
         item_count = 0
         item_list = self.intermediate.empty_list(name)
-        quad = None
         tail = self.intermediate.empty_quad()
 
         temp = self.lookup(name)
-        m_from = int(self.intermediate.next_quad()) - 1
 
-        self.actual_par_item(name, item_count, item)
+        item = self.actual_par_item(name, item_count)
         item_count = item_count + 1
         self.intermediate.add_quad(item_list, item)
+        self.intermediate.merge(item_list, tail)
 
         while self.token == Token.COMMA:
             self.run_lexer()
             item_count = item_count + 1
-            self.actual_par_item(name, item_count, item)
-            quad = item
-            self.intermediate.add_quad(item_list, item)
-        '''
+            quad = self.actual_par_item(name, item_count)
+            self.intermediate.add_quad(item_list, quad)
+
         quad = tail
         while quad is not None:
             self.intermediate.add_quad(self.intermediate.quads, quad)
-        '''
+            self.intermediate.merge(self.intermediate.quads, tail)
+            quad = quad.prev
+
         if item_count != temp.type_data.arg_num:
             self.error_handler("wrong number of arguments", "actual_pars_list")
 
@@ -675,19 +699,15 @@ class Syntax(object):
         @name actual_par_item - ActualPars Item Rule.
         @return: Null.
     '''
-    def actual_par_item(self, name, item_count, item):
+
+    def actual_par_item(self, name, item_count):
         attr = self.intermediate.empty_attr()
 
         temp = self.lookup(name)
-        args = self.symbol_table.new_entry(name, Lang.TYPE_ARG)
 
         if item_count > temp.type_data.arg_num:
             self.error_handler("wrong number of arguments", "actual_par_item")
-        # args = temp.type_data.arguments[0]
-        # args = temp.type_data.arguments[len(temp.type_data.arguments) - 1]
 
-        # args = temp.type_data.arguments.pop(0)
-        # args = temp.type_data.arguments[item_count]
         args = temp.type_data.arguments.pop(0)
 
         if self.token == KnownState.IN:
@@ -695,7 +715,7 @@ class Syntax(object):
                 self.error_handler("passing argument " + str(item_count) + " by value", "actual_par_item")
             self.run_lexer()
             self.expression(attr)
-            item = self.intermediate.gen_quad("par", "CV", attr.place, "_")
+            return self.intermediate.gen_quad("par", "CV", attr.place, "_")
         elif self.token == KnownState.INOUT:
             if args.type != Lang.PARAMETER_TYPE_INOUT:
                 self.error_handler("passing argument " + str(item_count) + " by reference", "actual_par_item")
@@ -708,6 +728,7 @@ class Syntax(object):
 
                 item = self.intermediate.gen_quad("par", "REF", self.get_lexer_buffer(), "_")
                 self.run_lexer()
+                return item
             else:
                 self.error_handler("expected id.", "actual_par item")
         else:
@@ -717,6 +738,7 @@ class Syntax(object):
         @name expression - Expression Rule.
         @return: Null.
     '''
+
     def expression(self, attr):
         attr1 = self.intermediate.empty_attr()
         attr2 = self.intermediate.empty_attr()
@@ -797,22 +819,24 @@ class Syntax(object):
                 symbol = self.lookup(name)
                 if (symbol is not None and symbol.type != Lang.TYPE_FUNC) or symbol is None:
                     self.error_handler(name + " is not a function.", "factor")
+                if symbol is not None and symbol.type_data.func_type == Lang.FUNC_TYPE_PROC:
+                    self.error_handler(name + " is not a function.", "factor")
                 self.actual_pars(name)
                 temp = self.intermediate.new_temp()
                 self.intermediate.gen_quad("par", "RET", temp, "_")
-                self.intermediate.gen_quad("call", "_", "_", temp)
+                self.intermediate.gen_quad("call", "_", "_", name)
                 attr.place = temp
             else:
                 symbol = self.lookup(name)
 
                 if symbol is None:
                     self.error_handler("variable with id " + str(name) + " not found.", "factor")
-                elif symbol.type == Lang.TYPE_FUNC:
+                elif symbol.type == Lang.TYPE_FUNC and symbol.type_data.func_type != Lang.FUNC_TYPE_PROC:
                     temp = self.intermediate.new_temp()
                     self.intermediate.gen_quad("par", "RET", temp, "_")
-                    self.intermediate.gen_quad("call", "_", "_", temp)
+                    self.intermediate.gen_quad("call", "_", "_", name)
                     attr.place = temp
-                elif symbol.type == 'PROC':
+                elif symbol.type == Lang.TYPE_FUNC and symbol.type_data.func_type == Lang.FUNC_TYPE_PROC:
                     self.error_handler(name + "is not a function", "factor")
                 else:
                     attr.place = temp

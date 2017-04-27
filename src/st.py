@@ -56,7 +56,6 @@ class Symbol(object):
         self.global_scope = None
         self.scopes = []
         self.debug = debug
-        self.quad_label = 0
 
     def error_handler(self, message, caller):
         if self.debug:

@@ -23,7 +23,7 @@ class QuadList(object):
     def __init__(self, name):
         self.data = []
         self.name = name
-
+        self.next = None
 
 class Intermediate(object):
     def __init__(self, debug, symbol_table):

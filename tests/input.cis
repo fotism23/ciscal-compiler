@@ -4,7 +4,7 @@ program test{
     enddeclare
 
     procedure mpla(in a, in b, inout sum){
-        print(a);
+        print(a+b);
         print(b);
         sum := a + b;
     }
