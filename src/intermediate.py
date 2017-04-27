@@ -15,8 +15,8 @@ class Quad(object):
 class BoolAttr(object):
     def __init__(self):
         self.place = ''
-        self.true = QuadList("truelist")
-        self.false = QuadList("falselist")
+        self.true = QuadList("true_list")
+        self.false = QuadList("false_list")
 
 
 class QuadList(object):
@@ -24,6 +24,7 @@ class QuadList(object):
         self.data = []
         self.name = name
         self.next = None
+
 
 class Intermediate(object):
     def __init__(self, debug, symbol_table):
@@ -83,10 +84,11 @@ class Intermediate(object):
 
         list_iterator = list1
 
-        while list_iterator.next is not None:
+        while list_iterator is not None:
             list_iterator = list_iterator.next
 
-        list_iterator.next = list2
+        list_iterator = list2
+        list1.next = list_iterator
         return list1
 
     def backpatch(self, m_list, z):

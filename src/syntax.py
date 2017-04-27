@@ -299,18 +299,17 @@ class Syntax(object):
     '''
 
     def sequence(self, sym_list):
-        temp_list = self.intermediate.empty_list("temp")
+        s_list = self.intermediate.empty_list("temp1")
 
-        self.statement(temp_list)
+        self.statement(s_list)
+        temp_list = s_list.next
         # todo fix
         # temp = temp_list.data[-1s]
         while self.token == Token.SEMICOL:
             self.run_lexer()
-            self.statement(temp_list)
-            # todo fix
-            # temp = self.intermediate.merge(temp, temp_list.next)
-            # todo fix
-            # sym_list.append(temp)
+            self.statement(s_list)
+            temp_list = self.intermediate.merge(temp_list, s_list)
+        sym_list.next = temp_list
 
     '''
         @name brackets_sequence - Brackets Sequence Rule.
@@ -668,7 +667,7 @@ class Syntax(object):
     '''
 
     def actual_pars_list(self, name):
-        item = self.intermediate.empty_quad()
+        # item = self.intermediate.empty_quad()
         item_count = 0
         item_list = self.intermediate.empty_list(name)
         tail = self.intermediate.empty_quad()
