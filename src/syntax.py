@@ -117,6 +117,8 @@ class Syntax(object):
             self.run_lexer()
             return name
         else:
+            # todo remove this
+            self.intermediate.generate_file()
             self.error_handler("id expected", "id_section")
 
     '''

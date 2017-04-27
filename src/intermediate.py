@@ -50,6 +50,8 @@ class Intermediate(object):
 
     def gen_quad(self, operator, x, y, z):
         quad = Quad(operator, x, y, z)
+        quad.label = str(self.quad_label)
+        self.quad_label = self.quad_label + 1
         self.add_quad(self.quads, quad)
         return quad
 
@@ -109,3 +111,9 @@ class Intermediate(object):
                     quad.z = z
                 quad = quad.next
             temp_list = temp_list.next
+
+    def generate_file(self):
+        with open("icode.ic", "w") as out_file:
+            for i in self.quads.data:
+                out_file.write(str(i.label) + "\t: " + str(i.operator) + " " + str(i.x) + " " + str(i.y) + " " + str(i.z) + "\n")
+            out_file.close()
