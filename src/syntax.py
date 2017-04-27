@@ -53,6 +53,14 @@ class Syntax(object):
         exit(0)
 
     '''
+      @name get_program_id - Get the program name string.
+      @return: program name string.
+    '''
+
+    def get_program_id(self):
+        return self.program_id
+
+    '''
         @name run_syntax - Runs the the syntax.
         @return: Null.
     '''
@@ -117,8 +125,8 @@ class Syntax(object):
             self.run_lexer()
             return name
         else:
-            # todo remove this
-            self.intermediate.generate_file()
+            self.intermediate.generate_int_file(self.get_program_id())
+            self.intermediate.generate_c_code(self.get_program_id())
             self.error_handler("id expected", "id_section")
 
     '''

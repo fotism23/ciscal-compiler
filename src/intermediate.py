@@ -1,4 +1,5 @@
 #!/usr/bin/python
+from src.consts import Lang
 
 
 class Quad(object):
@@ -112,8 +113,31 @@ class Intermediate(object):
                 quad = quad.next
             temp_list = temp_list.next
 
-    def generate_file(self):
-        with open("icode.ic", "w") as out_file:
+    def generate_int_file(self, name):
+        with open(name + ".int", "w") as out_file:
             for i in self.quads.data:
-                out_file.write(str(i.label) + "\t: " + str(i.operator) + " " + str(i.x) + " " + str(i.y) + " " + str(i.z) + "\n")
+                out_file.write("L_" + str(i.label) + ": " + str(i.operator) + " " + str(i.x) + " " + str(i.y) + " " + str(i.z) + "\n")
             out_file.close()
+
+    def generate_c_code(self, name):
+        with open(name + ".c", "w") as out_file:
+            out_file.write("int main() {\n")
+            for global_entry in self.symbol_table.global_scope.children_entries:
+                if global_entry.type == Lang.TYPE_VAR:
+                    out_file.write("\tint " + global_entry.name + ";\n")
+            out_file.write("\n")
+
+            for i in self.quads.data:
+                if i.operator == ":=":
+                    out_file.write("\tL_" + str(i.label) + ": " + str(i.z) + "=" + i.x + ";\n")
+                elif i.operator == "=":
+                    out_file.write("\tL_" + str(i.label) + ": if(" + str(i.x) + "==" + str(i.y) + " goto L_" + str(i.z) + ";\n")
+                elif i.operator == "jump":
+                    out_file.write("\tL_" + str(i.label) + ": goto L_" + i.z + ";\n")
+                elif i.operator == "<" or i.operator == ">":
+                    out_file.write("\tL_" + str(i.label) + ": if(" + str(i.x) + str(i.operator) + str(i.y) + " goto L_" + str(i.z) + ";\n")
+                elif i.operator == "print":
+                    out_file.write("\tL_" + str(i.label) + ": printf(\"%d\", " + str(i.x) + ");\n")
+                elif i.operator == "+":
+                    out_file.write("\tL_" + str(i.label) + ": " + str(i.z) + "=" + str(i.x) + str(i.operator) + str(i.y) + ";\n")
+            out_file.write("}")

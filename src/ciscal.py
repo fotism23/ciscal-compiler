@@ -100,6 +100,9 @@ def main(argv):
     m_syntax = syntax.Syntax(m_lexer, m_symbol, m_inter)
     m_syntax.run_syntax()
 
+    m_inter.generate_int_file(m_syntax.get_program_id())
+    m_inter.generate_c_code(m_syntax.get_program_id())
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])
