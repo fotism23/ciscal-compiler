@@ -15,7 +15,7 @@ class Lexer(object):
     '''
         @name init_lexer
         @param input_content: Source code input in string representation.
-        @param debug: Enable Debuging Boolean (Developers only).
+        @param debug: Enable Debugging Boolean (Developers only).
         @return: Null.
     '''
 
@@ -168,7 +168,8 @@ class Lexer(object):
         @return: True if state is terminal. False if Not.
     '''
 
-    def is_terminal_state(self, state):
+    @staticmethod
+    def is_terminal_state(state):
         if ((state >= Token.ALPHANUM) and (state <= KnownState.COMMENT)) or (state is Error.ERROR_NOT_KNOWN_STATE):
             return True
         return False
@@ -219,17 +220,14 @@ class Lexer(object):
         return Error.ERROR_NOT_KNOWN_CHARACTER
 
     '''
-        @name lexer
-
-        @functionality :
+        @name lexer - Main lexer function.
+        @return - None
     '''
 
     def lexer(self):
         current_state = Token.NT_START
         current_char = ''
-        current_char_type = -1
         self.local_buffer = ''
-        old_character = ''
 
         while True:
             old_character = current_char

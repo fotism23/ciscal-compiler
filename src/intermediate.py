@@ -24,6 +24,10 @@ class QuadList(object):
         self.data = []
         self.name = name
         self.next = None
+        self.can_exit = False
+
+    def merge(self, list2):
+        self.next = list2
 
 
 class Intermediate(object):
@@ -56,6 +60,14 @@ class Intermediate(object):
         return var_id
 
     @staticmethod
+    def get_exit_list(m_list):
+        while m_list is not None:
+            if m_list.can_exit:
+                return m_list
+            m_list = m_list.next
+        return None
+
+    @staticmethod
     def add_quad(quads, quad):
         quads.data.append(quad)
 
@@ -82,19 +94,18 @@ class Intermediate(object):
         elif list2 is None:
             return list1
 
-        list_iterator = list1
+        while list1.next is not None:
+            list1 = list1.next
 
-        while list_iterator is not None:
-            list_iterator = list_iterator.next
-
-        list_iterator = list2
-        list1.next = list_iterator
+        list1.next = list2
         return list1
 
-    def backpatch(self, m_list, z):
+    def back_patch(self, m_list, z):
         temp_list = m_list
         while temp_list is not None:
             quad = self.quads
             while quad is not None:
+                if not temp_list.can_exit and quad.name != temp_list.name and quad.z != "_":
+                    quad.z = z
                 quad = quad.next
             temp_list = temp_list.next

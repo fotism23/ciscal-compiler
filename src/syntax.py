@@ -172,8 +172,7 @@ class Syntax(object):
             else:
                 self.error_handler("{ expected", "block")
 
-            # todo fix this
-            self.intermediate.backpatch(sym_list.next, str(self.intermediate.next_quad()))
+            self.intermediate.back_patch(sym_list.next, str(self.intermediate.next_quad()))
             self.intermediate.gen_quad("halt", "_", "_", "_")
             self.intermediate.gen_quad("end_block", self.program_id, "_", "_")
         else:
@@ -183,7 +182,6 @@ class Syntax(object):
                 self.subprogram()
 
                 temp = self.lookup(block_name)
-                # todo : fix
                 if temp is not None:
                     temp.type_data.start_quad_id = self.intermediate.quad_label
 
@@ -199,7 +197,7 @@ class Syntax(object):
             else:
                 self.error_handler("{ expected", "block")
 
-            self.intermediate.backpatch(sym_list.next, str(self.intermediate.next_quad()))
+            self.intermediate.back_patch(sym_list.next, str(self.intermediate.next_quad()))
             self.intermediate.gen_quad("end_block", self.program_id, "_", "_")
 
     '''
@@ -303,12 +301,12 @@ class Syntax(object):
 
         self.statement(s_list)
         temp_list = s_list.next
-        # todo fix
-        # temp = temp_list.data[-1s]
+
         while self.token == Token.SEMICOL:
             self.run_lexer()
             self.statement(s_list)
-            temp_list = self.intermediate.merge(temp_list, s_list)
+            if temp_list is not None:
+                temp_list.merge(s_list)
         sym_list.next = temp_list
 
     '''
@@ -352,13 +350,16 @@ class Syntax(object):
             self.assignment_statement(sym_list)
         elif self.token == KnownState.IF:
             self.if_statement(sym_list)
-            self.intermediate.backpatch(sym_list, str(self.intermediate.next_quad()))
+            self.intermediate.back_patch(sym_list, str(self.intermediate.next_quad()))
         elif self.token == KnownState.DO:
             self.do_while_statement(sym_list)
             sym_list.next = None
         elif self.token == KnownState.EXIT:
-            # todo fix this
             self.exit_statement()
+            m_list = self.intermediate.make_list(str(self.intermediate.next_quad()))
+            m_list.can_exit = True
+            self.intermediate.gen_quad("jump", "_", "_", "_")
+            sym_list.merge(m_list)
         elif self.token == KnownState.RETURN:
             self.return_statement(sym_list)
         elif self.token == KnownState.SELECT:
@@ -370,7 +371,7 @@ class Syntax(object):
         elif self.token == KnownState.WHILE:
             self.while_statement(sym_list)
         else:
-            pass
+            sym_list.next = None
 
     '''
         @name assignment_statement - Assignment Statement Rule.
@@ -396,7 +397,6 @@ class Syntax(object):
                     self.run_lexer()
                     self.expression(attr)
                     self.intermediate.gen_quad(":=", attr.place, "_", variable_id)
-                    # todo fix this
                     sym_list.next = None
                 else:
                     self.error_handler("assignment operator ( = ) expected", "assignment_statement")
@@ -428,11 +428,10 @@ class Syntax(object):
                     m_list = self.intermediate.make_list(str(self.intermediate.next_quad()))
                     self.intermediate.gen_quad("jump", "_", "_", "_")
                     q2 = self.intermediate.next_quad()
-                    self.elsepart(tail)
+                    self.else_part(tail)
 
-                    self.intermediate.backpatch(attr.true, str(q1))
-                    self.intermediate.backpatch(attr.false, str(q2))
-                    # TODO : fix this
+                    self.intermediate.back_patch(attr.true, str(q1))
+                    self.intermediate.back_patch(attr.false, str(q2))
                     sym_list.next = self.intermediate.merge(s1.next, m_list)
                     sym_list.next = self.intermediate.merge(sym_list, tail.next)
 
@@ -443,7 +442,12 @@ class Syntax(object):
         else:
             self.error_handler("if expected", "id statement")
 
-    def elsepart(self, tail):
+    '''
+        @name else_part - ElsePart Rule.
+        @return: Null.
+    '''
+
+    def else_part(self, tail):
         s2 = self.intermediate.empty_list()
         if self.token == KnownState.ELSE:
             self.run_lexer()
@@ -467,9 +471,9 @@ class Syntax(object):
             if self.token == Token.LEFTPAR:
                 self.run_lexer()
                 self.condition(attr)
-                self.intermediate.backpatch(attr.true, str(self.intermediate.next_quad()))
+                self.intermediate.back_patch(attr.true, str(self.intermediate.next_quad()))
                 p2 = self.intermediate.next_quad()
-                self.intermediate.backpatch(attr.false, str(self.intermediate.next_quad()))
+                self.intermediate.back_patch(attr.false, str(self.intermediate.next_quad()))
 
                 if self.token == Token.RIGHTPAR:
                     self.run_lexer()
@@ -483,6 +487,11 @@ class Syntax(object):
                 self.error_handler("expected ( after while statement.", "while statement")
         else:
             self.error_handler("expected while statement.", "while statement")
+
+    '''
+        @name do_while_statement - DoWhile Statement Rule.
+        @return: Null.
+    '''
 
     def do_while_statement(self, sym_list):
         attr = self.intermediate.empty_attr()
@@ -500,10 +509,13 @@ class Syntax(object):
                 if self.token == Token.LEFTPAR:
                     self.run_lexer()
                     self.condition(attr)
-                    self.intermediate.backpatch(attr.true, str(p1))
+                    self.intermediate.back_patch(attr.true, str(p1))
                     p2 = self.intermediate.next_quad()
-                    self.intermediate.backpatch(attr.true, str(p2))
-                    # todo fix this exitlist
+                    self.intermediate.back_patch(attr.true, str(p2))
+                    exit_list = self.intermediate.get_exit_list(s1)
+                    if exit_list is not None:
+                        exit_list.can_exit = False
+                        self.intermediate.back_patch(exit_list, str(p2))
                     if self.token == Token.RIGHTPAR:
                         self.run_lexer()
                         sym_list.next = s1.next
@@ -515,6 +527,11 @@ class Syntax(object):
                 self.error_handler("expected while statement.", "do while statement")
         else:
             self.error_handler("expected do.", "do while statement")
+
+    '''
+        @name select_statement - Select Statement Rule.
+        @return: Null.
+    '''
 
     def select_statement(self):
         if self.token == KnownState.SELECT:
@@ -855,7 +872,7 @@ class Syntax(object):
             self.run_lexer()
             quad = self.intermediate.next_quad()
             self.bool_term(attr2)
-            self.intermediate.backpatch(attr.false, str(quad))
+            self.intermediate.back_patch(attr.false, str(quad))
             attr.true = self.intermediate.merge(attr.true, attr2.true)
             attr.false = attr2.false
 
@@ -874,7 +891,7 @@ class Syntax(object):
             self.run_lexer()
             quad = self.intermediate.next_quad()
             self.bool_factor(attr2)
-            self.intermediate.backpatch(attr.true, str(quad))
+            self.intermediate.back_patch(attr.true, str(quad))
             attr.false = self.intermediate.merge(attr.false, attr2.false)
             attr.false = attr2.true
 
@@ -936,9 +953,3 @@ class Syntax(object):
     '''
         Syntax rules functions End.
     '''
-
-
-class Statement(object):
-    def __init__(self, m_type, m_statement_id):
-        self.type = m_type
-        self.statement_id = m_statement_id

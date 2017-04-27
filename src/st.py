@@ -64,8 +64,8 @@ class Symbol(object):
         exit(0)
 
     @staticmethod
-    def new_entry(name, type):
-        return Entry(name, type)
+    def new_entry(name, entry_type):
+        return Entry(name, entry_type)
 
     def push_scope(self, name):
         scope = Scope(self.level, name)
@@ -85,21 +85,12 @@ class Symbol(object):
             self.current_scope = scope
 
     def pop_scope(self):
-        # TODO : pop scope
         if self.current_scope.parent_entry is not None:
             if not self.current_scope.parent_entry.type_data.has_return and self.current_scope.parent_entry.type_data.func_type == Lang.FUNC_TYPE_FUNC:
                 self.error_handler("function " + self.current_scope.from_entry.name + " has no return statement", "pop_scope")
 
         if self.scopes[len(self.scopes) - 1] is not None:
             self.current_scope = self.scopes.pop()
-            cur = self.current_scope.children_entries[0]
-
-            '''
-            while cur is not None:
-                if cur.type == Lang.TYPE_FUNC:
-                    arg = cur.type_data.arguments.pop()
-                cur = cur.next
-            '''
 
     def add_symbol(self, symbol):
         if symbol.type == Lang.TYPE_FUNC and symbol.type_data.func_type == Lang.FUNC_TYPE_PROG:
