@@ -921,7 +921,6 @@ class Syntax(object):
                 self.condition(m_attr)
                 if self.token == Token.RIGHTSBRACK:
                     self.run_lexer()
-                    '''todo check'''
                     attr.false = m_attr.false
                     attr.true = m_attr.true
                 else:
