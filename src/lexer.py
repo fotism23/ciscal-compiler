@@ -122,7 +122,7 @@ class Lexer(object):
         transitions = [
             [
                 Token.NT_NUM, Token.NT_ALPHA, Token.WHITE, Token.ADDOPERATOR, Token.MULTOPERATOR,
-                Token.LESSTHAN, Token.GREATERTHAN, Token.EQUALS, Token.SLASH, Token.STAR, Token.LEFTSBRACK,
+                Token.NT_LESSTHAN, Token.NT_GREATERTHAN, Token.EQUALS, Token.SLASH, Token.STAR, Token.LEFTSBRACK,
                 Token.RIGHTSBRACK, Token.LEFTCBRACK, Token.RIGHTCBRACK, Token.LEFTPAR, Token.RIGHTPAR,
                 Token.COMMA, Token.SEMICOL, Token.COL, state, Error.ERROR_NOT_KNOWN_STATE
             ],
@@ -216,6 +216,8 @@ class Lexer(object):
             return Type.SEMICOL
         elif current_char is ':':
             return Type.COL
+        elif current_char != "\n":
+            return KnownState.EOF
 
         return Error.ERROR_NOT_KNOWN_CHARACTER
 
@@ -226,14 +228,14 @@ class Lexer(object):
 
     def lexer(self):
         current_state = Token.NT_START
-        current_char = ''
         self.local_buffer = ''
 
         while True:
-            old_character = current_char
             current_char = self.get_next_character()
 
             current_char_type = self.identify_character_type(current_char)
+            if current_char_type == KnownState.EOF:
+                return KnownState.EOF
 
             if current_state != Token.NT_COMMENT:
                 if current_char is '/':
@@ -264,21 +266,18 @@ class Lexer(object):
                 if self.is_terminal_state(current_state) and current_state != Token.WHITE:
                     if current_state == Token.ALPHANUM:
                         self.put_character_back()
-                        current_char = old_character
 
                         self.local_buffer = self.local_buffer[:-1]
-                        if str(self.local_buffer) in Lang.reserved:
+                        if self.local_buffer in Lang.reserved:
                             index = Lang.reserved.index(self.local_buffer)
                             return KnownState.AND + index
 
                     if current_state == Token.NUM:
                         self.put_character_back()
-                        current_char = old_character
                         self.local_buffer = self.local_buffer[:-1]
 
                     if current_state == Token.GREATERTHAN or current_state == Token.LESSTHAN:
                         self.put_character_back()
-                        current_char = old_character
 
                         self.local_buffer = self.local_buffer[:-1]
 

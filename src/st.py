@@ -8,7 +8,6 @@ class Entry(object):
         self.type = entry_type
         self.name = name
         self.type_data = None
-        self.offset = 0
         self.level = 0
 
 
@@ -19,7 +18,10 @@ class Function(object):
         self.arguments = []
         self.start_quad_id = -1
         self.has_return = False
-        self.arg_num = len(self.arguments)
+        self.arg_num = 0
+
+    def get_arg_num(self):
+        return len(self.arguments)
 
 
 class Argument(object):
@@ -51,7 +53,6 @@ class Scope:
 class Symbol(object):
     def __init__(self, debug):
         self.level = 1
-        self.offset = 0
         self.current_scope = None
         self.global_scope = None
         self.scopes = []
@@ -60,6 +61,7 @@ class Symbol(object):
     def error_handler(self, message, caller):
         if self.debug:
             print "Caller: " + caller
+        print "Error!!!"
         print message
         exit(0)
 
@@ -70,6 +72,7 @@ class Symbol(object):
     def push_scope(self, name):
         scope = Scope(self.level, name)
         self.level = self.level + 1
+        scope.encl_scope = self.current_scope
 
         if self.current_scope is not None:
             parent_entry = self.lookup(name)
@@ -89,8 +92,15 @@ class Symbol(object):
             if not self.current_scope.parent_entry.type_data.has_return and self.current_scope.parent_entry.type_data.func_type == Lang.FUNC_TYPE_FUNC:
                 self.error_handler("function " + self.current_scope.from_entry.name + " has no return statement", "pop_scope")
 
+        if len(self.scopes) == 0:
+            return
+
         if self.scopes[len(self.scopes) - 1] is not None:
             self.current_scope = self.scopes.pop()
+
+        self.current_scope = self.current_scope.encl_scope
+        if self.current_scope is None:
+            self.current_scope = self.global_scope
 
     def add_symbol(self, symbol):
         if symbol.type == Lang.TYPE_FUNC and symbol.type_data.func_type == Lang.FUNC_TYPE_PROG:

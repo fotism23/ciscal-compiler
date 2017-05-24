@@ -7,6 +7,7 @@ import intermediate
 import lexer
 import st
 import syntax
+import final
 
 err_message = 'test'
 input_file_path = ''
@@ -33,16 +34,6 @@ def print_err_message():
 
     print err_message
     sys.exit()
-
-
-'''
-    @name generate_output_file - Generates the output file. 
-    @return: Null 
-'''
-
-
-def generate_output_file():
-    global output_file_path, output_content
 
 
 '''
@@ -102,6 +93,13 @@ def main(argv):
 
     m_inter.generate_int_file(m_syntax.get_program_id())
     m_inter.generate_c_code(m_syntax.get_program_id())
+
+    m_final = final.Final(debug, m_syntax.get_program_id(), m_symbol)
+    m_final.generate_final(m_inter)
+    m_final.generate_out_file(output_file_path)
+
+    print "\n" + output_file_path + " file has been created."
+    print "\nDone."
 
 
 if __name__ == "__main__":

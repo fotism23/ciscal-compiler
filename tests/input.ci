@@ -1,23 +1,34 @@
-program test{
+program test {
     declare
-	    sum, i, j
+        sum, i, j
     enddeclare
 
+
+    function g(in k) {
+        return (1);
+    }
+
+
     procedure mpla(in a, in b, inout sum){
-        print(a+b);
+        print(a);
         print(b);
         sum := a + b;
     }
 
+    /*
+    if (i < j) {
+        print(i);
+    }
+    */
+
+    i := g(in 1);
+
     i := 0;
-    do{
+    while(i<0){
         j := 2*i;
         call mpla(in i, in j, inout sum);
-        i := i +1;
-    }while(i<j)
+        i := i+1;
+    };
     print(sum);
 }
-
-
-
 
