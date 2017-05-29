@@ -19,6 +19,7 @@ class Function(object):
         self.start_quad_id = -1
         self.has_return = False
         self.arg_num = 0
+        self.scope = None  # mplampla
 
     def get_arg_num(self):
         return len(self.arguments)
@@ -42,11 +43,11 @@ class Scope:
         self.nesting_level = nesting_level
 
         self.encl_scope = None
-        self.frame_length = 0
+        self.frame_length = 12
 
         self.caller = None
 
-        self.parent_entry = None
+        # self.parent_entry = None
         self.children_entries = []
 
 
@@ -73,12 +74,18 @@ class Symbol(object):
         scope = Scope(self.level, name)
         self.level = self.level + 1
         scope.encl_scope = self.current_scope
+        scope.frame_length = 12
+
+        s = self.lookup(name)
+        if s is not None and s.type == Lang.TYPE_FUNC:
+            s.type_data.scope = scope
 
         if self.current_scope is not None:
             parent_entry = self.lookup(name)
             scope.parent_entry = parent_entry
         else:
             scope.parent_entry = None
+            pass
 
         if self.current_scope is None:
             self.current_scope = scope
@@ -87,7 +94,13 @@ class Symbol(object):
         else:
             self.current_scope = scope
 
+
+
+        #if len(self.current_scope.children_entries) > 1 and self.current_scope.children_entries[1].type == Lang.TYPE_FUNC:
+         #   self.current_scope.children_entries[1].type_data.scope = self.current_scope
+
     def pop_scope(self):
+
         if self.current_scope.parent_entry is not None:
             if not self.current_scope.parent_entry.type_data.has_return and self.current_scope.parent_entry.type_data.func_type == Lang.FUNC_TYPE_FUNC:
                 self.error_handler("function " + self.current_scope.from_entry.name + " has no return statement", "pop_scope")
@@ -101,6 +114,8 @@ class Symbol(object):
         self.current_scope = self.current_scope.encl_scope
         if self.current_scope is None:
             self.current_scope = self.global_scope
+
+
 
     def add_symbol(self, symbol):
         if symbol.type == Lang.TYPE_FUNC and symbol.type_data.func_type == Lang.FUNC_TYPE_PROG:
@@ -188,4 +203,14 @@ class Symbol(object):
                 if str(name) == sym.name:
                     return sym
             current_scope = current_scope.encl_scope
+        return None
+
+    def look_for_argument(self, name):
+        current_scope = self.current_scope
+        while current_scope is not None:
+            for sym in current_scope.children_entries:
+                if sym.type == Lang.TYPE_FUNC:
+                    for arg in sym.type_data.arguments:
+                        if arg.name == name:
+                            return arg
         return None

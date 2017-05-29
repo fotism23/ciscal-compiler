@@ -107,6 +107,7 @@ class Syntax(object):
     def program(self):
         if self.token == KnownState.PROGRAM:
             self.run_lexer()
+            self.program_block = True
             name = self.id_section()
             self.block(name)
         else:
@@ -453,7 +454,7 @@ class Syntax(object):
                     self.run_lexer()
                     self.brack_or_statement(s1)
                     # todo fix
-                    m_list = self.intermediate.make_list(str(self.intermediate.next_quad()), self.intermediate.next_quad())
+                    # m_list = self.intermediate.make_list(str(self.intermediate.next_quad()), self.intermediate.next_quad())
                     self.intermediate.gen_quad("jump", "_", "_", "_")
                     q2 = self.intermediate.next_quad()
 
@@ -771,7 +772,10 @@ class Syntax(object):
         if item_count > temp.type_data.arg_num:
             self.error_handler("wrong number of arguments", "actual_par_item")
 
+
         args = temp.type_data.arguments.pop(0)
+        temp.type_data.arguments.append(args)
+        #args = temp.type_data.arguments[temp.type_data.arg_num - item_count - 1]
 
         if self.token == KnownState.IN:
             if args.type != Lang.PARAMETER_TYPE_IN:
@@ -828,7 +832,7 @@ class Syntax(object):
         if self.token == Token.ADDOPERATOR:
             op = self.get_lexer_buffer()
             self.run_lexer()
-            self.term(attr1)
+            # self.term(attr1)
             temp = self.intermediate.new_temp()
             self.intermediate.gen_quad(op, "0", attr1.place, temp)
             attr1.place = temp

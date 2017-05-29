@@ -69,7 +69,7 @@ class Lexer(object):
 
     @staticmethod
     def is_white(char):
-        return (char is '\n') or (char is ' ') or (char is '\t')
+        return (char is '\n') or (char is ' ') or (char is '\t') or (char is '\r')
 
     '''
         @name operator

@@ -25,8 +25,20 @@ class QuadList(object):
         self.can_exit = False
         self.index = -1
 
+    '''
+        @name merge - Merges the list with the a list argument passed.
+        @param list2 - List to merge.
+        @return: Null.
+    '''
+
     def merge(self, list2):
         self.data.extend(list2.data)
+
+    '''
+        @name add_quad - Adds a quad to the quadlist.
+        @param quad - Quad to be added.
+        @return: Null.
+    '''
 
     def add_quad(self, quad):
         self.data.append(quad)
@@ -49,19 +61,18 @@ class Intermediate(object):
         print message
         exit(0)
 
+    '''
+        @name next_quad - get the next quad label.
+        @return: next quad label.
+    '''
+
     def next_quad(self):
         return self.quad_label
 
-    def get_next_list(self, m_list):
-        if m_list.index >= len(self.list_of_quads) - 1:
-            return None
-        return self.list_of_quads[m_list.index + 1]
-
-    def set_next_list(self, s_list, m_list):
-        self.list_of_quads.insert(s_list.index - 1, m_list)
-        for i in range(0, len(self.list_of_quads), 1):
-            if m_list is not None:
-                self.list_of_quads[i].index = i
+    '''
+        @name gen_quad - Generates a quad. 
+        @return: The quad generated.
+    '''
 
     def gen_quad(self, operator, x, y, z):
         quad = Quad(operator, x, y, z)
@@ -71,10 +82,12 @@ class Intermediate(object):
             self.list_of_quads[self.current_quad_list_index] = self.make_list(x, quad)
         else:
             self.list_of_quads[self.current_quad_list_index].add_quad(quad)
-        # self.list_of_quads(0).add_quad(self.list_of_quads(0), quad)  # todo fix
-        # if self.quad_list is None:
-        #    self.list_of_quads.append(self.quads)
         return quad
+
+    '''
+        @name new_temp - generated a temporary variable.
+        @return: Generated variable.
+    '''
 
     def new_temp(self):
         var_id = 'temp' + str(self.temp_id)
@@ -83,25 +96,12 @@ class Intermediate(object):
         return var_id
 
     def get_exit_list(self, m_list):
-        # while m_list is not None:
         i = m_list.index
         for index in range(i, len(self.list_of_quads)):
             m_list = self.list_of_quads[i]
             if m_list.can_exit:
                 return m_list
         return None
-
-    @staticmethod
-    def empty_list(name):
-        return QuadList(name)
-
-    @staticmethod
-    def empty_quad():
-        return Quad(None, None, None, None)
-
-    @staticmethod
-    def empty_attr():
-        return BoolAttr()
 
     def make_list(self, name, element):
         quad_list = self.empty_list(name)
@@ -112,19 +112,6 @@ class Intermediate(object):
 
     def go_to_next(self):
         self.current_quad_list_index = self.current_quad_list_index + 1
-
-    @staticmethod
-    def merge(list1, list2):
-        if list1 is None:
-            return list2
-        elif list2 is None:
-            return list1
-
-        # while list1.next is not None:
-        #    list1 = list1.next
-
-        list1.data.extend(list2.data)
-        return list1
 
     def back_patch(self, m_list, z):
         i = m_list.index
@@ -170,3 +157,24 @@ class Intermediate(object):
             out_file.write("}")
             out_file.close()
             print "C code generated.\n"
+
+    @staticmethod
+    def empty_list(name):
+        return QuadList(name)
+
+    @staticmethod
+    def empty_quad():
+        return Quad(None, None, None, None)
+
+    @staticmethod
+    def empty_attr():
+        return BoolAttr()
+
+    @staticmethod
+    def merge(list1, list2):
+        if list1 is None:
+            return list2
+        elif list2 is None:
+            return list1
+        list1.data.extend(list2.data)
+        return list1

@@ -1,4 +1,10 @@
 #!/usr/bin/python
+
+'''
+    Character type enumerators
+'''
+
+
 class Type:
     NUM = 0
     ALPHA = 1
@@ -62,6 +68,9 @@ class Lang:
     PARAMETER_TYPE_IN = 10
     PARAMETER_TYPE_INOUT = 11
 
+'''
+    Token enumerators.
+'''
 
 class Token:
     NT_START = 0
@@ -94,6 +103,9 @@ class Token:
     SEMICOL = 27
     COL = 28
 
+'''
+    Known state enumerators.
+'''
 
 class KnownState:
     AND = 29
@@ -119,6 +131,9 @@ class KnownState:
     SELECT = 49
     DEFAULT = 50
 
+'''
+    Error id.
+'''
 
 class Error:
     ERROR_NOT_KNOWN_STATE = -1

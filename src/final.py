@@ -34,15 +34,16 @@ class Final(object):
                 cur_code = self.code_list.pop(0)
                 out_file.write(str(cur_code.instruction) + "\n")
         out_file.close()
-        print "Final Code generated."
+        print "Final Code generated. Lines : " + str(self.lines_generated)
 
     def add_machine_code(self, instruction):
         code_obj = Code(instruction, self.current_index)
         self.current_index = self.current_index + 1
         self.code_list.append(code_obj)
+        self.lines_generated = self.lines_generated + 1
 
     def generate_final(self, intermediate):
-        print "Generating Final Code."
+        print "Generating Final Code"
         quad_lists = intermediate.list_of_quads
         for quad_list in quad_lists:
             for quad in quad_list.data:
@@ -174,6 +175,8 @@ class Final(object):
             self.add_machine_code("li $t" + reg + "," + value)
         else:
             p = self.symbol_table.lookup(value)
+            if p is None:
+                p = self.symbol_table.look_for_argument(value)
 
             if p.level == 1:
                 self.add_machine_code("lw $t" + reg + ",-" + str(p.offset) + "($s0)")
@@ -183,7 +186,7 @@ class Final(object):
                         self.add_machine_code("lw $t0, -" + p.offset + "($sp)")
                         self.add_machine_code("lw $t" + reg + ",($t0)")
                     else:
-                        self.add_machine_code("lw $t" + reg + ",-" + p.offset + "($sp)")
+                        self.add_machine_code("lw $t" + reg + ",-" + str(p.offset) + "($sp)")
                     return
                 elif p.level < self.current_nesting_level:
                     self.gnlvcode(p.name)
@@ -197,6 +200,8 @@ class Final(object):
     def storerv(self, reg, value):
         reg = str(reg)
         p = self.symbol_table.lookup(value)
+        if p is None:
+            p = self.symbol_table.look_for_argument(value)
 
         if p.level == 1:
             self.add_machine_code("sw %t" + reg + ",-" + str(p.offset) + "($s0)")

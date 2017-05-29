@@ -14,7 +14,8 @@ AM : 2486
     - run ARGS="[your_arguments]":           Runs the compiler with custom parameters.
     - clean:         Removes all the unnecessary files from previous runs.
     - help:          Shows Usage.
-    - debug:         Enables bebug printouts.
+    - debug:         Enables debug printouts.
+    - test:          Runs default test files on tests directory.
 
 # Contact
 - fotismitropoulos@gmail.com

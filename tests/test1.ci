@@ -1,47 +1,15 @@
-program test {
-    declare
-		sum, i, j
-    enddeclare
-
-    procedure mpla(in a, in b, inout sum){
-        print(a);
-        print(b);
-        sum := a + b;
-    }
-
-    i := 0;
-    while(i<0){
-        j := 2*i;
-        call test(in i, in j, inout sum);
-        i := i+1;
-        exit;
-    }
-    print(sum);
+program main {
+	print(-3);
+	print(-45643);
+	print(1-10);
+	print(0-10);
+	print(10-1);
+	print(10-0);
+	print(2*10);
+	print(10/2);
+	print(2/10);
+	print(7/3);
+	print(-7/5);
+	print(1234/(-2));
+	print(4*1111);
 }
-        
-
-    
-        
-program test{
-    declare
-	    sum, i, j
-    enddeclare
-
-    procedure mpla(in a, in b, inout sum){
-        print(a+b);
-        print(b);
-        sum := a + b;
-    }
-
-    i := 0;
-    do{
-        j := 2*i;
-        call mpla(in i, in j, inout sum);
-        i := i +1;
-    }while(i<j)
-    print(sum);
-}
-
-
-
-
